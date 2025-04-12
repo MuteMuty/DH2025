@@ -54,10 +54,16 @@ export const useAppStore = defineStore('appStore', () => {
   }) {
     const query = { name, orderBy, sortOrder }
     try {
-      const fetchedSearchResults = await searchProductsApi(query)
+      const response = await searchProductsApi(query)
+      // Handle both array response and object with items array
+      const fetchedSearchResults = Array.isArray(response) ? response : response || []
       searchResults.value = fetchedSearchResults
+      console.log('Search results:', fetchedSearchResults)
+      return fetchedSearchResults
     } catch (error) {
       console.error('Error searching products:', error)
+      searchResults.value = []
+      return []
     }
   }
 
@@ -94,6 +100,7 @@ export const useAppStore = defineStore('appStore', () => {
 
   return {
     trendingDiscounts,
+    searchResults,
     shoppingCart,
     addToCart,
     getShoppingCart,

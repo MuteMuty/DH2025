@@ -157,7 +157,7 @@ const onSearchInput = handleSearchInput
 //   }
 // }
 
-const toggleStoreMenu = (event: any) => {
+const toggleStoreMenu = (event: MouseEvent) => {
   storeOverlay.value.toggle(event)
 }
 </script>
@@ -170,9 +170,10 @@ const toggleStoreMenu = (event: any) => {
 :deep(.p-menubar) {
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background-color: var(--surface-card);
+  padding: 0.75rem 1.5rem;
+  background-color: #FFFFFF;
   border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .navigation-links {
@@ -182,15 +183,22 @@ const toggleStoreMenu = (event: any) => {
 }
 
 .nav-link {
-  color: var(--text-color);
+  color: #2C2C2C;
   text-decoration: none;
   padding: 0.5rem 1rem;
   font-weight: 500;
-  transition: color 0.2s;
+  transition: color 0.2s, background-color 0.2s;
+  border-radius: 6px;
 }
 
 .nav-link:hover {
-  color: var(--primary-color);
+  color: #4A90E2;
+  background-color: rgba(74, 144, 226, 0.05);
+}
+
+.nav-link.router-link-active {
+  color: #4A90E2;
+  font-weight: 600;
 }
 
 .nav-link + .nav-link {
@@ -207,11 +215,24 @@ const toggleStoreMenu = (event: any) => {
 .search-container {
   width: 100%;
   max-width: 500px;
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
 }
 
 .search-container .p-inputtext {
   width: 100%;
+  border-radius: 8px;
+  border: 1px solid #E0E0E0;
+  padding: 0.75rem 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-container .p-inputtext:hover {
+  border-color: #4A90E2;
+}
+
+.search-container .p-inputtext:focus {
+  border-color: #4A90E2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
 
 .store-selector {
@@ -220,12 +241,15 @@ const toggleStoreMenu = (event: any) => {
 }
 
 .store-button {
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 2.75rem;
+  width: 2.75rem;
+  color: #2C2C2C;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .store-button:hover {
-  background-color: var(--surface-hover);
+  background-color: rgba(74, 144, 226, 0.1);
+  color: #4A90E2;
 }
 
 .cart-container {
@@ -242,31 +266,69 @@ const toggleStoreMenu = (event: any) => {
   min-width: 1.2rem;
   height: 1.2rem;
   font-size: 0.7rem;
+  background-color: #4A90E2;
+}
+
+:deep(.p-badge-danger) {
+  background-color: #FF6B6B;
+}
+
+:deep(.p-badge-secondary) {
+  background-color: #E0E0E0;
+  color: #2C2C2C;
+}
+
+:deep(.p-badge-primary) {
+  background-color: #4A90E2;
 }
 
 .store-checkbox-container {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding: 0.5rem 0;
 }
 
 .store-checkbox-item {
   display: flex;
   align-items: center;
-  padding: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 6px;
 }
 
 .store-checkbox-item:hover {
-  background-color: var(--surface-hover);
-  border-radius: 4px;
+  background-color: rgba(74, 144, 226, 0.05);
 }
 
 .store-actions {
   display: flex;
   justify-content: space-between;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--surface-border);
+  padding-top: 0.75rem;
+  border-top: 1px solid #E0E0E0;
+}
+
+:deep(.store-actions .p-button-text) {
+  color: #4A90E2;
+}
+
+:deep(.store-actions .p-button-text:hover) {
+  background-color: rgba(74, 144, 226, 0.1);
+}
+
+:deep(.p-overlaypanel) {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #E0E0E0;
+}
+
+:deep(.p-overlaypanel:before, .p-overlaypanel:after) {
+  border-bottom-color: #FFFFFF;
+}
+
+:deep(.p-checkbox-box.p-highlight) {
+  border-color: #4A90E2;
+  background-color: #4A90E2;
 }
 
 @media (min-width: 768px) {
@@ -288,7 +350,7 @@ const toggleStoreMenu = (event: any) => {
 
 @media (max-width: 768px) {
   .navigation-links {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     margin-right: 0;
   }
 
@@ -303,8 +365,12 @@ const toggleStoreMenu = (event: any) => {
   }
 
   .store-selector {
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
     justify-content: flex-end;
+  }
+
+  .search-container {
+    margin-right: 0;
   }
 }
 </style>
