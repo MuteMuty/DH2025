@@ -1,6 +1,6 @@
 <template>
   <div class="menu-bar">
-    <Menubar :model="items">
+    <Menubar>
       <template #start>
         <div class="navigation-links">
           <router-link to="/" class="nav-link">Home</router-link>
@@ -12,7 +12,7 @@
             <InputText
               v-model="searchQuery"
               placeholder="Search for products..."
-              @keyup.enter="searchProducts"
+              @keyup.enter="() => {}"
               @input="handleSearchInput"
             />
           </div>
@@ -21,8 +21,16 @@
           <div class="store-selector">
             <OverlayPanel ref="storeOverlay" :style="{ width: '250px' }">
               <div class="store-checkbox-container">
-                <div v-for="option in storeOptions.slice(1)" :key="option.value" class="store-checkbox-item">
-                  <Checkbox v-model="selectedStores" :value="option.value" :inputId="option.value" />
+                <div
+                  v-for="option in storeOptions.slice(1)"
+                  :key="option.value"
+                  class="store-checkbox-item"
+                >
+                  <Checkbox
+                    v-model="selectedStores"
+                    :value="option.value"
+                    :inputId="option.value"
+                  />
                   <label :for="option.value" class="ml-2">{{ option.name }}</label>
                 </div>
               </div>
@@ -68,34 +76,30 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const searchQuery = ref('')
-const selectedStores = ref([])
-const storeOverlay = ref(null)
-const debounceTimeout = ref(null)
+const selectedStores = ref<string[]>([])
+const storeOverlay = ref<any>(null)
+const debounceTimeout = ref<number | null>(null)
 
 const storeOptions = [
-  { name: 'All Stores', value: null },
   { name: 'Lidl', value: 'Lidl' },
   { name: 'Hofer', value: 'Hofer' },
   { name: 'Spar', value: 'Spar' },
-  { name: 'Mercator', value: 'Mercator' }
+  { name: 'Mercator', value: 'Mercator' },
 ]
 
 // Computed property for the badge count
 const selectedStoresBadge = computed(() => {
-  const count = selectedStores.value.length;
-  return count > 0 ? count.toString() : '';
+  const count = selectedStores.value.length
+  return count > 0 ? count.toString() : ''
 })
 
 // Function to select all stores
 const selectAllStores = () => {
-  selectedStores.value = storeOptions.slice(1).map(option => option.value)
+  selectedStores.value = storeOptions.map((option) => option.value)
 }
 
-// Remove items array as we're now using direct router-links
-const items = []
-
 // Handle both search input and empty search
-const handleSearchInput = (event) => {
+const handleSearchInput = (event: any) => {
   const query = event.target.value.trim()
 
   // Clear previous timeout
@@ -121,8 +125,8 @@ const handleSearchInput = (event) => {
           path: '/search',
           query: {
             q: query,
-            ...(selectedStores.value.length > 0 ? { stores: selectedStores.value.join(',') } : {})
-          }
+            ...(selectedStores.value.length > 0 ? { stores: selectedStores.value.join(',') } : {}),
+          },
         })
       } else {
         // If already on search page, just update the query parameter
@@ -130,8 +134,8 @@ const handleSearchInput = (event) => {
           query: {
             ...route.query,
             q: query,
-            ...(selectedStores.value.length > 0 ? { stores: selectedStores.value.join(',') } : {})
-          }
+            ...(selectedStores.value.length > 0 ? { stores: selectedStores.value.join(',') } : {}),
+          },
         })
       }
     }, 300)
@@ -141,23 +145,23 @@ const handleSearchInput = (event) => {
 // For backwards compatibility, keeping the original function name but calling our new handler
 const onSearchInput = handleSearchInput
 
-const searchProducts = () => {
-  if (searchQuery.value.trim()) {
-    const query = { q: searchQuery.value }
+// const searchProducts = () => {
+//   if (searchQuery.value.trim()) {
+//     const query = { q: searchQuery.value }
 
-    if (selectedStores.value.length > 0) {
-      query.stores = selectedStores.value.join(',')
-    }
+//     if (selectedStores.value.length > 0) {
+//       query.stores = selectedStores.value.join(',')
+//     }
 
-    router.push({
-      path: '/search',
-      query
-    })
-    searchQuery.value = ''
-  }
-}
+//     router.push({
+//       path: '/search',
+//       query,
+//     })
+//     searchQuery.value = ''
+//   }
+// }
 
-const toggleStoreMenu = (event) => {
+const toggleStoreMenu = (event: any) => {
   storeOverlay.value.toggle(event)
 }
 </script>
