@@ -21,11 +21,7 @@
           <div class="store-selector">
             <OverlayPanel ref="storeOverlay" :style="{ width: '250px' }">
               <div class="store-checkbox-container">
-                <div
-                  v-for="option in storeOptions.slice(1)"
-                  :key="option.value"
-                  class="store-checkbox-item"
-                >
+                <div v-for="option in storeOptions" :key="option.value" class="store-checkbox-item">
                   <Checkbox
                     v-model="selectedStores"
                     :value="option.value"
