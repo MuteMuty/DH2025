@@ -37,7 +37,7 @@
             </OverlayPanel>
 
             <Button
-              icon="pi pi-plus"
+              icon="pi pi-filter"
               class="store-button"
               aria-label="Select Stores"
               @click="toggleStoreMenu"
@@ -157,7 +157,7 @@ const onSearchInput = handleSearchInput
 //   }
 // }
 
-const toggleStoreMenu = (event: MouseEvent) => {
+const toggleStoreMenu = (event: any) => {
   storeOverlay.value.toggle(event)
 }
 </script>
@@ -170,10 +170,9 @@ const toggleStoreMenu = (event: MouseEvent) => {
 :deep(.p-menubar) {
   display: flex;
   justify-content: space-between;
-  padding: 0.75rem 1.5rem;
-  background-color: #FFFFFF;
+  padding: 0.5rem 1rem;
+  background-color: var(--surface-card);
   border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .navigation-links {
@@ -183,22 +182,15 @@ const toggleStoreMenu = (event: MouseEvent) => {
 }
 
 .nav-link {
-  color: #2C2C2C;
+  color: var(--text-color);
   text-decoration: none;
   padding: 0.5rem 1rem;
   font-weight: 500;
-  transition: color 0.2s, background-color 0.2s;
-  border-radius: 6px;
+  transition: color 0.2s;
 }
 
 .nav-link:hover {
-  color: #4A90E2;
-  background-color: rgba(74, 144, 226, 0.05);
-}
-
-.nav-link.router-link-active {
-  color: #4A90E2;
-  font-weight: 600;
+  color: var(--primary-color);
 }
 
 .nav-link + .nav-link {
@@ -215,24 +207,11 @@ const toggleStoreMenu = (event: MouseEvent) => {
 .search-container {
   width: 100%;
   max-width: 500px;
-  margin-right: 0.75rem;
+  margin-right: 0.5rem;
 }
 
 .search-container .p-inputtext {
   width: 100%;
-  border-radius: 8px;
-  border: 1px solid #E0E0E0;
-  padding: 0.75rem 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.search-container .p-inputtext:hover {
-  border-color: #4A90E2;
-}
-
-.search-container .p-inputtext:focus {
-  border-color: #4A90E2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
 
 .store-selector {
@@ -241,15 +220,12 @@ const toggleStoreMenu = (event: MouseEvent) => {
 }
 
 .store-button {
-  height: 2.75rem;
-  width: 2.75rem;
-  color: #2C2C2C;
-  transition: background-color 0.2s, color 0.2s;
+  height: 2.5rem;
+  width: 5rem;
 }
 
 .store-button:hover {
-  background-color: rgba(74, 144, 226, 0.1);
-  color: #4A90E2;
+  background-color: var(--surface-hover);
 }
 
 .cart-container {
@@ -266,69 +242,31 @@ const toggleStoreMenu = (event: MouseEvent) => {
   min-width: 1.2rem;
   height: 1.2rem;
   font-size: 0.7rem;
-  background-color: #4A90E2;
-}
-
-:deep(.p-badge-danger) {
-  background-color: #FF6B6B;
-}
-
-:deep(.p-badge-secondary) {
-  background-color: #E0E0E0;
-  color: #2C2C2C;
-}
-
-:deep(.p-badge-primary) {
-  background-color: #4A90E2;
 }
 
 .store-checkbox-container {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  padding: 0.5rem 0;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .store-checkbox-item {
   display: flex;
   align-items: center;
-  padding: 0.5rem;
-  border-radius: 6px;
+  padding: 0.25rem;
 }
 
 .store-checkbox-item:hover {
-  background-color: rgba(74, 144, 226, 0.05);
+  background-color: var(--surface-hover);
+  border-radius: 4px;
 }
 
 .store-actions {
   display: flex;
   justify-content: space-between;
-  padding-top: 0.75rem;
-  border-top: 1px solid #E0E0E0;
-}
-
-:deep(.store-actions .p-button-text) {
-  color: #4A90E2;
-}
-
-:deep(.store-actions .p-button-text:hover) {
-  background-color: rgba(74, 144, 226, 0.1);
-}
-
-:deep(.p-overlaypanel) {
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid #E0E0E0;
-}
-
-:deep(.p-overlaypanel:before, .p-overlaypanel:after) {
-  border-bottom-color: #FFFFFF;
-}
-
-:deep(.p-checkbox-box.p-highlight) {
-  border-color: #4A90E2;
-  background-color: #4A90E2;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--surface-border);
 }
 
 @media (min-width: 768px) {
@@ -350,7 +288,7 @@ const toggleStoreMenu = (event: MouseEvent) => {
 
 @media (max-width: 768px) {
   .navigation-links {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     margin-right: 0;
   }
 
@@ -365,12 +303,8 @@ const toggleStoreMenu = (event: MouseEvent) => {
   }
 
   .store-selector {
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
     justify-content: flex-end;
-  }
-
-  .search-container {
-    margin-right: 0;
   }
 }
 </style>
