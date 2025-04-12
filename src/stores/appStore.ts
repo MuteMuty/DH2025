@@ -1,14 +1,20 @@
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Discounts } from '@/types'
-import { searchProductsApi, getCartItemsApi, addToCartApi, notificationsSignUpApi } from '@/api'
+import {
+  searchProductsApi,
+  getCartItemsApi,
+  addToCartApi,
+  notificationsSignUpApi,
+  getTrendingItemsApi,
+} from '@/api'
 import { initFirebase, initMessagingAndRequestNotificationPermission } from '@/firebase'
 import { getOrCreateUserId } from '@/utils'
 
 export const useAppStore = defineStore('appStore', () => {
   const shoppingCart = ref<Discounts[]>([])
   const searchResults = ref<Discounts[]>([])
-  const trendingItems = ref<Discounts[]>([])
+  const trendingDiscounts = ref<Discounts[]>([])
 
   const firebaseToken = ref<string | null>(null)
   const userId = ref<string | null>(null)
@@ -18,7 +24,7 @@ export const useAppStore = defineStore('appStore', () => {
       if (!userId.value) {
         throw new Error('User ID is not set')
       }
-      await addToCartApi(userId.value, discountItem.id)
+      await addToCartApi(userId.value, discountItem._id)
       shoppingCart.value.push(discountItem)
     } catch (error) {
       console.error('Error adding to cart:', error)
@@ -55,11 +61,11 @@ export const useAppStore = defineStore('appStore', () => {
     }
   }
 
-  async function getTrendingItems() {
-    const query = { sortBy: 'tredingScore', sortOrder: 'desc' }
+  async function loadTrendingItems() {
+    console.log('Loading trending items')
     try {
-      const fetchedTrendingItems = await searchProductsApi(query)
-      trendingItems.value = fetchedTrendingItems
+      const fetchedTrendingItems = await getTrendingItemsApi()
+      trendingDiscounts.value = fetchedTrendingItems
     } catch (error) {
       console.error('Error getting trending items:', error)
     }
@@ -87,11 +93,12 @@ export const useAppStore = defineStore('appStore', () => {
   }
 
   return {
+    trendingDiscounts,
     shoppingCart,
     addToCart,
     getShoppingCart,
     searchProducts,
-    getTrendingItems,
+    loadTrendingItems,
     init,
   }
 })

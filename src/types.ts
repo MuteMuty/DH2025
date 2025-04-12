@@ -1,11 +1,21 @@
+type BoundingBox = {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 export type Discounts = {
-  id: string
-  name: string
-  discount: number
-  originalPrice: number
-  discountPrice: number
+  _id: string
+  item_description: string
+  discount_price: number
+  discount_percentage: number
   store: Store
-  trendingScore: number
+  offer_start_date: string
+  offer_end_date: string
+  trending_score: number
+  quantity: string
+  bounding_box: BoundingBox
 }
 
 export type Store = {

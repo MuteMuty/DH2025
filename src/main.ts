@@ -12,7 +12,7 @@ import Checkbox from 'primevue/checkbox'
 import OverlayPanel from 'primevue/overlaypanel'
 
 // PrimeVue theme imports - make sure these come AFTER installing primeicons
-import 'primeicons/primeicons.css'       // Icons
+import 'primeicons/primeicons.css' // Icons
 import Aura from '@primeuix/themes/aura' // Aura theme preset
 import { useAppStore } from './stores/appStore'
 

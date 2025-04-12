@@ -9,7 +9,7 @@ type QueryObject = {
 }
 
 // API base URL
-const API_BASE_URL = 'http://localhost:3000/api'
+const API_BASE_URL = 'https://goldfish-app-w3ydc.ondigitalocean.app/api'
 
 // Search products
 export const searchProductsApi = async (query: QueryObject): Promise<Discounts[]> => {
@@ -25,6 +25,15 @@ export const searchProductsApi = async (query: QueryObject): Promise<Discounts[]
   }
 }
 
+export const getTrendingItemsApi = async (): Promise<Discounts[]> => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/trending`)
+    return response.data
+  } catch (error) {
+    console.error('Error getting trending items:', error)
+    throw error
+  }
+}
 // Shopping Cart operations
 export const getCartItemsApi = async (userId: string): Promise<Discounts[]> => {
   try {
@@ -38,7 +47,7 @@ export const getCartItemsApi = async (userId: string): Promise<Discounts[]> => {
   }
 }
 
-export const addToCartApi = async (userId: string, discountId: Discounts['id']): Promise<void> => {
+export const addToCartApi = async (userId: string, discountId: Discounts['_id']): Promise<void> => {
   try {
     await axios.post(`${API_BASE_URL}/shoppingCart`, {
       userId,
