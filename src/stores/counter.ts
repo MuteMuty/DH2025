@@ -1,12 +1,21 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useCounterStore = defineStore('counter', () => {
-  const count = ref(0)
-  const doubleCount = computed(() => count.value * 2)
-  function increment() {
-    count.value++
-  }
+type Discounts = {
+  id: string
+  name: string
+  discount: number
+  originalPrice: number
+  discountPrice: number
+  store: Store
+}
 
-  return { count, doubleCount, increment }
+type Store = {
+  name: 'Lidl' | 'Hofer' | 'Spar' | 'Mercator'
+}
+
+export const useAppStore = defineStore('appStore', () => {
+  const discounts = ref<Discounts[]>([])
+
+  return { discounts }
 })
