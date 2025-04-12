@@ -49,3 +49,19 @@ export const addToCartApi = async (userId: string, discountId: Discounts['id']):
     throw error
   }
 }
+
+export const notificationsSignUpApi = async (
+  userId: string,
+  firebaseToken: string,
+): Promise<void> => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/notifications`, {
+      userId,
+      firebaseToken,
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error sending notifications:', error)
+    throw error
+  }
+}

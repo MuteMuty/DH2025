@@ -14,6 +14,7 @@ import OverlayPanel from 'primevue/overlaypanel'
 // PrimeVue theme imports - make sure these come AFTER installing primeicons
 import 'primeicons/primeicons.css'       // Icons
 import Aura from '@primeuix/themes/aura' // Aura theme preset
+import { useAppStore } from './stores/appStore'
 
 const app = createApp(App)
 
@@ -30,3 +31,6 @@ app.component('Checkbox', Checkbox)
 app.component('OverlayPanel', OverlayPanel)
 
 app.mount('#app')
+
+const appStore = useAppStore()
+appStore.init()
