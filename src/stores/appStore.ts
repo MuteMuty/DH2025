@@ -19,6 +19,8 @@ export const useAppStore = defineStore('appStore', () => {
   const firebaseToken = ref<string | null>(null)
   const userId = ref<string | null>(null)
 
+  const isNotificationVisible = ref(false)
+
   async function addToCart(discountItem: Discounts) {
     try {
       if (!userId.value) {
@@ -99,6 +101,7 @@ export const useAppStore = defineStore('appStore', () => {
   }
 
   return {
+    isNotificationVisible,
     trendingDiscounts,
     searchResults,
     shoppingCart,

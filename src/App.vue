@@ -5,11 +5,13 @@
   <main>
     <RouterView />
   </main>
+  <Notification />
 </template>
 
 <script lang="ts" setup>
 import MenuBar from './components/MenuBar.vue'
 import { RouterView } from 'vue-router'
+import Notification from './components/Notification.vue'
 </script>
 
 <style scoped>

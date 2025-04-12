@@ -50,6 +50,16 @@
         </div>
       </template>
       <template #end>
+        <div class="notification-button">
+          <Toast />
+          <Button
+            @click="toggleNotification"
+            icon="pi pi-bell"
+            rounded
+            text
+            badgeClass="p-badge-danger"
+          />
+        </div>
         <div class="cart-container">
           <router-link to="/shopping-cart" class="cart-link">
             <Button icon="pi pi-shopping-cart" rounded text badge="2" badgeClass="p-badge-danger" />
@@ -67,7 +77,11 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import Checkbox from 'primevue/checkbox'
 import OverlayPanel from 'primevue/overlaypanel'
+import Toast from 'primevue/toast'
 import { useRouter, useRoute } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
+import { useAppStore } from '../stores/appStore'
+const toast = useToast()
 
 const router = useRouter()
 const route = useRoute()
@@ -138,27 +152,22 @@ const handleSearchInput = (event: any) => {
   }
 }
 
-// For backwards compatibility, keeping the original function name but calling our new handler
-const onSearchInput = handleSearchInput
-
-// const searchProducts = () => {
-//   if (searchQuery.value.trim()) {
-//     const query = { q: searchQuery.value }
-
-//     if (selectedStores.value.length > 0) {
-//       query.stores = selectedStores.value.join(',')
-//     }
-
-//     router.push({
-//       path: '/search',
-//       query,
-//     })
-//     searchQuery.value = ''
-//   }
-// }
-
 const toggleStoreMenu = (event: MouseEvent) => {
   storeOverlay.value.toggle(event)
+}
+
+const toggleNotification = () => {
+  console.log('toggleNotification')
+  toast.add({
+    severity: 'info',
+    summary: 'Notifications',
+    detail: 'Enabled notifications for discount',
+    life: 3000,
+  })
+
+  setTimeout(() => {
+    useAppStore().isNotificationVisible = true
+  }, 6000)
 }
 </script>
 
@@ -171,7 +180,7 @@ const toggleStoreMenu = (event: MouseEvent) => {
   display: flex;
   justify-content: space-between;
   padding: 0.75rem 1.5rem;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
@@ -183,21 +192,23 @@ const toggleStoreMenu = (event: MouseEvent) => {
 }
 
 .nav-link {
-  color: #2C2C2C;
+  color: #2c2c2c;
   text-decoration: none;
   padding: 0.5rem 1rem;
   font-weight: 500;
-  transition: color 0.2s, background-color 0.2s;
+  transition:
+    color 0.2s,
+    background-color 0.2s;
   border-radius: 6px;
 }
 
 .nav-link:hover {
-  color: #4A90E2;
+  color: #4a90e2;
   background-color: rgba(74, 144, 226, 0.05);
 }
 
 .nav-link.router-link-active {
-  color: #4A90E2;
+  color: #4a90e2;
   font-weight: 600;
 }
 
@@ -221,17 +232,19 @@ const toggleStoreMenu = (event: MouseEvent) => {
 .search-container .p-inputtext {
   width: 100%;
   border-radius: 8px;
-  border: 1px solid #E0E0E0;
+  border: 1px solid #e0e0e0;
   padding: 0.75rem 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .search-container .p-inputtext:hover {
-  border-color: #4A90E2;
+  border-color: #4a90e2;
 }
 
 .search-container .p-inputtext:focus {
-  border-color: #4A90E2;
+  border-color: #4a90e2;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
 
@@ -243,13 +256,15 @@ const toggleStoreMenu = (event: MouseEvent) => {
 .store-button {
   height: 2.75rem;
   width: 2.75rem;
-  color: #2C2C2C;
-  transition: background-color 0.2s, color 0.2s;
+  color: #2c2c2c;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .store-button:hover {
   background-color: rgba(74, 144, 226, 0.1);
-  color: #4A90E2;
+  color: #4a90e2;
 }
 
 .cart-container {
@@ -266,20 +281,20 @@ const toggleStoreMenu = (event: MouseEvent) => {
   min-width: 1.2rem;
   height: 1.2rem;
   font-size: 0.7rem;
-  background-color: #4A90E2;
+  background-color: #4a90e2;
 }
 
 :deep(.p-badge-danger) {
-  background-color: #FF6B6B;
+  background-color: #ff6b6b;
 }
 
 :deep(.p-badge-secondary) {
-  background-color: #E0E0E0;
-  color: #2C2C2C;
+  background-color: #e0e0e0;
+  color: #2c2c2c;
 }
 
 :deep(.p-badge-primary) {
-  background-color: #4A90E2;
+  background-color: #4a90e2;
 }
 
 .store-checkbox-container {
@@ -305,11 +320,11 @@ const toggleStoreMenu = (event: MouseEvent) => {
   display: flex;
   justify-content: space-between;
   padding-top: 0.75rem;
-  border-top: 1px solid #E0E0E0;
+  border-top: 1px solid #e0e0e0;
 }
 
 :deep(.store-actions .p-button-text) {
-  color: #4A90E2;
+  color: #4a90e2;
 }
 
 :deep(.store-actions .p-button-text:hover) {
@@ -319,16 +334,16 @@ const toggleStoreMenu = (event: MouseEvent) => {
 :deep(.p-overlaypanel) {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid #E0E0E0;
+  border: 1px solid #e0e0e0;
 }
 
 :deep(.p-overlaypanel:before, .p-overlaypanel:after) {
-  border-bottom-color: #FFFFFF;
+  border-bottom-color: #ffffff;
 }
 
 :deep(.p-checkbox-box.p-highlight) {
-  border-color: #4A90E2;
-  background-color: #4A90E2;
+  border-color: #4a90e2;
+  background-color: #4a90e2;
 }
 
 @media (min-width: 768px) {
