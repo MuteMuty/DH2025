@@ -16,8 +16,9 @@
 
     <section class="nav-cards-section">
       <div class="grid">
-        <div class="col-12 md:col-4" v-for="item in navItems" :key="item.label">
-          <div class="card nav-card" @click="$router.push(item.route)">
+        <div class="col-12 md:col-4" v-for="(item, index) in navItems" :key="item.label">
+          <!-- Add animation with staggered delay -->
+          <div v-show="animateNav[index]" class="card nav-card fade-in" @click="$router.push(item.route)">
             <div class="card-header">
               <i :class="item.icon" />
             </div>
@@ -37,8 +38,9 @@
       </div>
 
       <div class="grid">
-        <div class="col-12 sm:col-6 lg:col-3" v-for="product in latestDeals" :key="product.id">
-          <div class="card product-card">
+        <div class="col-12 sm:col-6 lg:col-3" v-for="(product, index) in latestDeals" :key="product.id">
+          <!-- Add animation with staggered delay -->
+          <div v-show="animateDeals[index]" class="card product-card fade-in">
             <div class="discount-tag">-{{ product.discount }}%</div>
             <div class="store-tag" :class="`store-${product.store.name.toLowerCase()}`">
               {{ product.store.name }}
@@ -59,7 +61,10 @@
     <section class="stores-section">
       <h2>Popular Stores</h2>
       <div class="stores-grid">
-        <div class="store-item" v-for="store in stores" :key="store.name" @click="$router.push(`/search?store=${store.name}`)">
+        <div v-for="(store, index) in stores" :key="store.name"
+             v-show="animateStores[index]"
+             class="store-item fade-in"
+             @click="$router.push(`/search?store=${store.name}`)">
           <div class="store-logo" :class="`bg-${store.name.toLowerCase()}`">
             <span>{{ store.name[0] }}</span>
           </div>
@@ -71,10 +76,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
-import { useAppStore } from '@/stores/counter'
+import { useAppStore } from '@/stores/appStore'
 
 // Define types based on your store structure
 interface Store {
@@ -93,6 +98,11 @@ interface Product {
 const router = useRouter()
 const store = useAppStore()
 const searchQuery = ref('')
+
+// Animation state
+const animateNav = ref([false, false, false])
+const animateDeals = ref([false, false, false, false])
+const animateStores = ref([false, false, false, false])
 
 // Navigation items for the cards section
 const navItems = [
@@ -177,6 +187,26 @@ const addToCart = (product: Product) => {
   // For now, just navigate to cart
   router.push('/shopping-cart')
 }
+
+// Start animation sequence when component is mounted
+onMounted(() => {
+  // Animate navigation cards with staggered delay
+  setTimeout(() => { animateNav.value[0] = true }, 200)
+  setTimeout(() => { animateNav.value[1] = true }, 400)
+  setTimeout(() => { animateNav.value[2] = true }, 600)
+
+  // Animate deal cards with staggered delay
+  setTimeout(() => { animateDeals.value[0] = true }, 800)
+  setTimeout(() => { animateDeals.value[1] = true }, 1000)
+  setTimeout(() => { animateDeals.value[2] = true }, 1200)
+  setTimeout(() => { animateDeals.value[3] = true }, 1400)
+
+  // Animate stores with staggered delay
+  setTimeout(() => { animateStores.value[0] = true }, 1600)
+  setTimeout(() => { animateStores.value[1] = true }, 1700)
+  setTimeout(() => { animateStores.value[2] = true }, 1800)
+  setTimeout(() => { animateStores.value[3] = true }, 1900)
+})
 </script>
 
 <style scoped>
@@ -386,6 +416,23 @@ const addToCart = (product: Product) => {
 
 .store-name {
   font-weight: bold;
+}
+
+/* Animation styles */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px) {
