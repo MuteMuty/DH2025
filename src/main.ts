@@ -6,9 +6,14 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import PrimeVue from 'primevue/config'
-import Aura from '@primeuix/themes/aura'
 import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import Checkbox from 'primevue/checkbox'
+import OverlayPanel from 'primevue/overlaypanel'
 
+// PrimeVue theme imports - make sure these come AFTER installing primeicons
+import 'primeicons/primeicons.css'       // Icons
+import Aura from '@primeuix/themes/aura' // Aura theme preset
 import { useAppStore } from './stores/appStore'
 
 const app = createApp(App)
@@ -21,6 +26,9 @@ app.use(PrimeVue, {
   },
 })
 app.component('Button', Button)
+app.component('InputText', InputText)
+app.component('Checkbox', Checkbox)
+app.component('OverlayPanel', OverlayPanel)
 
 app.mount('#app')
 
