@@ -1,13 +1,6 @@
 import axios from 'axios'
 import type { Discounts } from '@/types'
 
-type QueryObject = {
-  sortBy?: string
-  sortOrder?: string
-  limit?: number
-  name?: string
-}
-
 // API base URL
 const API_BASE_URL = 'https://goldfish-app-w3ydc.ondigitalocean.app/api'
 

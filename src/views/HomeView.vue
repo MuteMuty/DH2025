@@ -3,7 +3,7 @@
     <section class="hero-section">
       <div class="hero-content">
         <h1>The Saving Grace</h1>
-        <p class="subtitle">Find the best discounts from your favorite stores</p>
+        <p class="subtitle">Because buying full price is a sin</p>
         <div class="search-box">
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
