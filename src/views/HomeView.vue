@@ -59,8 +59,8 @@
           <!-- Add animation with staggered delay -->
           <div v-show="animateDeals[index]" class="card product-card fade-in">
             <div class="discount-tag">-{{ discountItem.discount_percentage }}%</div>
-            <div class="store-tag" :class="`store-${discountItem.store.name}`">
-              {{ discountItem.store.name }}
+            <div class="store-tag" :class="`store-${discountItem.store}`">
+              {{ discountItem.store }}
             </div>
             <div class="product-details">
               <h3>{{ discountItem.item_description }}</h3>
@@ -84,15 +84,15 @@
       <div class="stores-grid">
         <div
           v-for="(store, index) in stores"
-          :key="store.name"
+          :key="store"
           v-show="animateStores[index]"
           class="store-item fade-in"
-          @click="$router.push(`/search?store=${store.name}`)"
+          @click="$router.push(`/search?store=${store}`)"
         >
-          <div class="store-logo" :class="`bg-${store.name.toLowerCase()}`">
-            <span>{{ store.name[0] }}</span>
+          <div class="store-logo" :class="`bg-${store.toLowerCase()}`">
+            <span>{{ store[0] }}</span>
           </div>
-          <span class="store-name">{{ store.name }}</span>
+          <span class="store-name">{{ store }}</span>
         </div>
       </div>
     </section>
@@ -104,7 +104,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import InputText from 'primevue/inputtext'
 import { useAppStore } from '@/stores/appStore'
-import type { Discounts, Store } from '@/types'
+import { Store, type Discounts } from '@/types'
 
 function getOgPrice(discountItem: Discounts) {
   return (discountItem.discount_price / (1 - discountItem.discount_percentage / 100)).toFixed(2)
@@ -147,12 +147,7 @@ const navItems = [
 ]
 
 // Mock data for stores
-const stores = ref<Store[]>([
-  { name: 'Lidl' },
-  { name: 'Hofer' },
-  { name: 'Spar' },
-  { name: 'Mercator' },
-])
+const stores = ref<Store[]>([Store.Lidl, Store.Hofer, Store.Spar, Store.Mercator, Store.Eurospin])
 
 // Function to handle search
 const searchProducts = () => {
@@ -328,20 +323,24 @@ onMounted(() => {
   font-weight: bold;
 }
 
-.store-lidl {
+.store-Lidl {
   background: #0050aa;
 }
 
-.store-hofer {
+.store-Hofer {
   background: #e30613;
 }
 
-.store-spar {
+.store-Spar {
   background: #008c45;
 }
 
-.store-mercator {
+.store-Mercator {
   background: #ce1126;
+}
+
+.store-Eurospin {
+  background: #0050aa;
 }
 
 .product-details {

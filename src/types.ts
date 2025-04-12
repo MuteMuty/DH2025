@@ -18,6 +18,10 @@ export type Discounts = {
   bounding_box: BoundingBox
 }
 
-export type Store = {
-  name: 'Lidl' | 'Hofer' | 'Spar' | 'Mercator'
+export enum Store {
+  Lidl = 'Lidl',
+  Hofer = 'Hofer',
+  Spar = 'Spar',
+  Mercator = 'Mercator',
+  Eurospin = 'Eurospin',
 }
