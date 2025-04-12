@@ -9,7 +9,12 @@
         <div class="menubar-content">
           <!-- Search without icon -->
           <div class="search-container">
-            <InputText v-model="searchQuery" placeholder="Search for products..." @keyup.enter="searchProducts" />
+            <InputText
+              v-model="searchQuery"
+              placeholder="Search for products..."
+              @keyup.enter="searchProducts"
+              @input="handleSearchInput"
+            />
           </div>
 
           <!-- Store selector as a dropdown with checkboxes -->
@@ -58,12 +63,14 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import Checkbox from 'primevue/checkbox'
 import OverlayPanel from 'primevue/overlaypanel'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 const searchQuery = ref('')
 const selectedStores = ref([])
 const storeOverlay = ref(null)
+const debounceTimeout = ref(null)
 
 const storeOptions = [
   { name: 'All Stores', value: null },
@@ -86,6 +93,53 @@ const selectAllStores = () => {
 
 // Remove items array as we're now using direct router-links
 const items = []
+
+// Handle both search input and empty search
+const handleSearchInput = (event) => {
+  const query = event.target.value.trim()
+
+  // Clear previous timeout
+  if (debounceTimeout.value) {
+    clearTimeout(debounceTimeout.value)
+  }
+
+  // If search is emptied and we're on the search page, go back to home
+  if (query === '' && route.name === 'search') {
+    debounceTimeout.value = setTimeout(() => {
+      router.push('/')
+    }, 300)
+    return
+  }
+
+  // Only navigate if we're typing something meaningful
+  if (query.length >= 2) {
+    // Set new timeout for debounce (300ms)
+    debounceTimeout.value = setTimeout(() => {
+      // Only navigate if we're not already on the search page
+      if (route.name !== 'search') {
+        router.push({
+          path: '/search',
+          query: {
+            q: query,
+            ...(selectedStores.value.length > 0 ? { stores: selectedStores.value.join(',') } : {})
+          }
+        })
+      } else {
+        // If already on search page, just update the query parameter
+        router.replace({
+          query: {
+            ...route.query,
+            q: query,
+            ...(selectedStores.value.length > 0 ? { stores: selectedStores.value.join(',') } : {})
+          }
+        })
+      }
+    }, 300)
+  }
+}
+
+// For backwards compatibility, keeping the original function name but calling our new handler
+const onSearchInput = handleSearchInput
 
 const searchProducts = () => {
   if (searchQuery.value.trim()) {
