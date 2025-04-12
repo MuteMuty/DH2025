@@ -75,11 +75,27 @@ export async function initMessagingAndRequestNotificationPermission() {
   onMessage(messaging, (payload: any) => {
     console.log('Message received: ', payload)
 
-    // if (payload.notification?.title && payload.notification?.body) {
-    //   store.title.value = payload.notification.title
-    //   store.message.value = payload.notification.body
-    //   store.openDialog()
-    // }
+    const { notification } = payload
+
+    if (notification) {
+      // Display a notification using the Browser Notification API
+      const notificationOptions = {
+        body: notification.body,
+        icon: notification.icon || '/favicon.ico',
+        badge: notification.badge,
+        image: notification.image,
+        tag: notification.tag || 'default',
+        data: payload.data,
+      }
+
+      if (serviceWorkerRegistration && serviceWorkerRegistration.showNotification) {
+        // Use the service worker to show the notification if available
+        serviceWorkerRegistration.showNotification(notification.title, notificationOptions)
+      } else {
+        // Fallback to the regular Notification API
+        new Notification(notification.title, notificationOptions)
+      }
+    }
   })
   return token
 }
