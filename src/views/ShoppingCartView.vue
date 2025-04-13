@@ -1,10 +1,10 @@
 <template>
   <div class="cart-container">
-    <h1>Wishlist Cart</h1>
+    <h1>Wishlist</h1>
 
     <div v-if="loading" class="loading-container">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a90e2"></i>
-      <p>Loading your cart...</p>
+      <p>Loading your wishlist...</p>
     </div>
 
     <div v-else-if="!cartItems.length" class="empty-cart">
