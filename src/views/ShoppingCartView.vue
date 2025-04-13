@@ -1,5 +1,396 @@
 <template>
-  <main>
+  <div class="cart-container">
     <h1>Shopping Cart</h1>
-  </main>
+
+    <div v-if="loading" class="loading-container">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4A90E2;"></i>
+      <p>Loading your cart...</p>
+    </div>
+
+    <div v-else-if="!cartItems.length" class="empty-cart">
+      <i class="pi pi-shopping-cart" style="font-size: 3rem; color: #ccc;"></i>
+      <h3>Your cart is empty</h3>
+      <p>Discover amazing deals and add them to your cart!</p>
+      <Button label="Browse Deals" @click="$router.push('/')" />
+    </div>
+
+    <div v-else class="cart-content">
+      <!-- Cart summary at the top -->
+
+
+      <!-- Products displayed in grid layout, same as other pages -->
+      <div class="grid">
+        <div
+          class="col-12 sm:col-6 lg:col-3"
+          v-for="cartItem in cartItems"
+          :key="cartItem.cart_item_id"
+        >
+          <div class="card product-card">
+            <div class="discount-tag" v-if="cartItem.discount.discount_percentage">
+              -{{ cartItem.discount.discount_percentage }}%
+            </div>
+            <div class="store-tag" :class="`store-${cartItem.discount.store.toLowerCase()}`">
+              {{ cartItem.discount.store }}
+            </div>
+            <div class="product-details">
+              <h3>{{ cartItem.discount.item_description }}</h3>
+              <div class="price-container">
+                <span class="original-price" v-if="cartItem.discount.discount_percentage">
+                  {{ getOriginalPrice(cartItem.discount) }}€
+                </span>
+                <span class="discount-price">{{ cartItem.discount.discount_price.toFixed(2) }}€</span>
+              </div>
+              <div class="quantity-tag">{{ cartItem.discount.quantity }}</div>
+              <div class="date-added">Added: {{ formatDate(cartItem.added_date) }}</div>
+            </div>
+            <Button
+              icon="pi pi-trash"
+              label="Remove from Cart"
+              severity="danger"
+              @click="removeItem(cartItem)"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cart-summary">
+        <div class="summary-row">
+          <span>Subtotal ({{ cartItems.length }} items)</span>
+          <span>{{ getTotalPrice() }}€</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span class="total-price">{{ getTotalPrice() }}€</span>
+        </div>
+        <div class="summary-savings" v-if="parseFloat(getTotalSavings()) > 0">
+          <span>You saved</span>
+          <span class="savings-amount">{{ getTotalSavings() }}€</span>
+        </div>
+      </div>
+  </div>
 </template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useAppStore } from '@/stores/appStore'
+import { useRouter } from 'vue-router'
+import Button from 'primevue/button'
+
+interface CartItem {
+  cart_item_id: string;
+  added_date: string;
+  discount: {
+    _id: string;
+    item_description: string;
+    discount_price: number;
+    discount_percentage: number;
+    store: string;
+    quantity: string;
+    offer_start_date: string;
+    offer_end_date: string;
+    trending_score: number;
+    bounding_box: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
+  }
+}
+
+const router = useRouter()
+const store = useAppStore()
+const loading = ref(true)
+const cartItems = ref<CartItem[]>([])
+
+// Format the date to be more user friendly
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
+// Calculate original price from discount price and percentage
+const getOriginalPrice = (discount: CartItem['discount']): string => {
+  if (!discount.discount_percentage) return discount.discount_price.toFixed(2);
+  return (discount.discount_price / (1 - discount.discount_percentage / 100)).toFixed(2);
+}
+
+// Load cart data when component is mounted
+onMounted(async () => {
+  try {
+    await store.getShoppingCart()
+
+    // Convert the store's shopping cart to the proper format
+    if (Array.isArray(store.shoppingCart)) {
+      if (store.shoppingCart.length > 0 && 'cart_item_id' in store.shoppingCart[0]) {
+        // If the API already returns the correct format, use it directly
+        cartItems.value = store.shoppingCart as unknown as CartItem[]
+      } else {
+        // Otherwise, format the item to match the expected cart item structure
+        // This is a fallback in case the API returns a different format
+        cartItems.value = store.shoppingCart.map(item => ({
+          cart_item_id: item._id,
+          added_date: new Date().toISOString(),
+          discount: item
+        }) as unknown as CartItem)
+      }
+    }
+  } finally {
+    loading.value = false
+  }
+})
+
+// Calculate total price
+const getTotalPrice = (): string => {
+  return cartItems.value
+    .reduce((total, item) => total + item.discount.discount_price, 0)
+    .toFixed(2)
+}
+
+// Calculate total savings
+const getTotalSavings = (): string => {
+  return cartItems.value
+    .reduce((total, item) => {
+      if (!item.discount.discount_percentage) return total
+      const originalPrice = item.discount.discount_price / (1 - item.discount.discount_percentage / 100)
+      return total + (originalPrice - item.discount.discount_price)
+    }, 0)
+    .toFixed(2)
+}
+
+// Remove item from cart
+const removeItem = (item: CartItem) => {
+  // Here you would typically call a remove API endpoint
+  const index = cartItems.value.findIndex(cartItem => cartItem.cart_item_id === item.cart_item_id)
+  if (index !== -1) {
+    cartItems.value.splice(index, 1)
+  }
+}
+</script>
+
+<style scoped>
+.cart-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  margin-bottom: 2rem;
+  color: #2C2C2C;
+  font-weight: 600;
+}
+
+.loading-container, .empty-cart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  text-align: center;
+  color: #666666;
+}
+
+.loading-container p {
+  margin-top: 1rem;
+}
+
+.empty-cart h3 {
+  margin-top: 1rem;
+  color: #2C2C2C;
+}
+
+.empty-cart p {
+  margin: 1rem 0 2rem;
+}
+
+.cart-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Cart summary */
+.cart-summary {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.summary-row.total {
+  border-top: 1px solid #E0E0E0;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.total-price {
+  color: #4A90E2;
+}
+
+.summary-savings {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  background-color: #F3FBF4;
+  border-radius: 8px;
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.savings-amount {
+  font-weight: bold;
+}
+
+.cart-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cart-actions button {
+  flex: 1;
+}
+
+/* Grid layout - same as in HomeView and SearchView */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -0.5rem;
+}
+
+.grid [class*='col-'] {
+  padding: 0.5rem;
+}
+
+.col-12 {
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 576px) {
+  .sm\:col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (min-width: 992px) {
+  .lg\:col-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+}
+
+/* Product card styles - same as in HomeView and SearchView */
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.product-card {
+  position: relative;
+  padding: 1.5rem;
+  height: 100%;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.discount-tag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #FF6B6B;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0 12px 0 12px;
+  font-weight: bold;
+}
+
+.store-tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px 0 12px 0;
+  color: white;
+  font-weight: bold;
+}
+
+.store-lidl { background: #0050AA; }
+.store-hofer { background: #E30613; }
+.store-spar { background: #008C45; }
+.store-mercator { background: #CE1126; }
+.store-eurospin { background: #0066CC; }
+
+.product-details {
+  margin: 1.5rem 0;
+}
+
+.product-details h3 {
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  color: #2C2C2C;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.price-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #6c757d;
+}
+
+.discount-price {
+  font-weight: bold;
+  color: #4caf50;
+  font-size: 1.2rem;
+}
+
+.quantity-tag {
+  color: #666666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.date-added {
+  color: #666666;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .cart-actions {
+    flex-direction: column;
+  }
+}
+</style>

@@ -67,6 +67,7 @@ const searchQuery = ref('')
 
 onMounted(async () => {
   store.loadTrendingItems()
+  store.getShoppingCart()
 })
 
 // Animation state
