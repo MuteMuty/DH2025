@@ -1,4 +1,4 @@
-import { reactive, ref } from 'vue'
+import {  ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Discounts } from '@/types'
 import {
@@ -6,7 +6,6 @@ import {
   getCartItemsApi,
   addToCartApi,
   removeFromCartApi, // Add this import
-  notificationsSignUpApi,
   getTrendingItemsApi,
 } from '@/api'
 import { initFirebase, initMessagingAndRequestNotificationPermission } from '@/firebase'
@@ -109,17 +108,7 @@ export const useAppStore = defineStore('appStore', () => {
     }
   }
 
-  async function notificationsSignUp() {
-    try {
-      if (!userId.value || !firebaseToken.value) {
-        throw new Error('User ID or Firebase token is not set')
-      }
-      await notificationsSignUpApi(userId.value, firebaseToken.value)
-    } catch (error) {
-      console.error('Error signing up for notifications:', error)
-    }
-  }
-
+  
   async function init() {
     userId.value = getOrCreateUserId()
     console.log('User ID:', userId.value)
