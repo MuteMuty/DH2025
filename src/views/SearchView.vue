@@ -27,10 +27,10 @@
       <div class="grid">
         <div
           class="col-12 sm:col-6 lg:col-3"
-          v-for="discountItem in filteredResults"
+          v-for="(discountItem, index) in filteredResults"
           :key="discountItem._id"
         >
-          <div class="card product-card">
+          <div v-show="animateItems[index]" class="card product-card fade-in">
             <!-- Circular discount tag like in HomeView -->
             <div class="discount-tag" v-if="discountItem.discount_percentage">
               -{{ discountItem.discount_percentage }}%
@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Button from 'primevue/button'
 import { useAppStore } from '@/stores/appStore'
@@ -87,6 +87,8 @@ const route = useRoute()
 const store = useAppStore()
 const loading = ref(false)
 const filteredResults = ref<Discounts[]>([])
+// Add animation state array
+const animateItems = ref<boolean[]>([])
 
 // Calculate original price from discount price and percentage
 const getOriginalPrice = (discountItem: Discounts): string => {
@@ -103,7 +105,24 @@ function formatDate(dateString: string): string {
 // Check if item is in cart function to match HomeView
 function isInCart(discountItem: Discounts) {
   return store.shoppingCart.some((item) =>
-    'discount' in item ? item.discount._id === discountItem._id : item._id === discountItem._id)
+    'discount' in item && typeof item.discount === 'object' && item.discount !== null
+      ? (item.discount as Discounts)._id === discountItem._id
+      : item._id === discountItem._id)
+}
+
+// Add this function to handle animation when results change
+const setupAnimation = (count: number) => {
+  // Reset animation states
+  animateItems.value = new Array(count).fill(false)
+
+  // Stagger the animations
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      if (i < animateItems.value.length) {
+        animateItems.value[i] = true
+      }
+    }, 100 + i * 100) // 100ms delay between each item
+  }
 }
 
 // Watch for URL query changes to trigger search
@@ -138,6 +157,9 @@ watch(
           // If no stores selected, show all results
           filteredResults.value = store.searchResults
         }
+
+        // Setup animation for the new results
+        setupAnimation(filteredResults.value.length)
       })
       .catch(error => {
         console.error('Search error:', error)
@@ -375,6 +397,22 @@ h1 {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+}
+
+/* Add these animation styles */
+.fade-in {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>

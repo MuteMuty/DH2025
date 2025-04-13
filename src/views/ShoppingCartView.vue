@@ -22,10 +22,10 @@
       <div class="grid">
         <div
           class="col-12 sm:col-6 lg:col-3"
-          v-for="cartItem in cartItems"
+          v-for="(cartItem, index) in cartItems"
           :key="cartItem.cart_item_id"
         >
-          <div class="card product-card">
+          <div v-show="animateItems[index]" class="card product-card fade-in">
             <div class="discount-tag" v-if="cartItem.discount.discount_percentage">
               -{{ cartItem.discount.discount_percentage }}%
             </div>
@@ -102,6 +102,8 @@ const router = useRouter()
 const store = useAppStore()
 const loading = ref(true)
 const cartItems = ref<CartItem[]>([])
+// Add animation state array
+const animateItems = ref<boolean[]>([])
 
 // Format the date to be more user friendly
 const formatDate = (dateString: string): string => {
@@ -131,13 +133,15 @@ onMounted(async () => {
         cartItems.value = store.shoppingCart as unknown as CartItem[]
       } else {
         // Otherwise, format the item to match the expected cart item structure
-        // This is a fallback in case the API returns a different format
         cartItems.value = store.shoppingCart.map(item => ({
           cart_item_id: item._id,
           added_date: new Date().toISOString(),
           discount: item
         }) as unknown as CartItem)
       }
+
+      // Setup animation for cart items
+      setupAnimation(cartItems.value)
     }
   } finally {
     loading.value = false
@@ -176,6 +180,9 @@ const removeItemFromCart = async (item: CartItem) => {
       const index = cartItems.value.findIndex(cartItem => cartItem.cart_item_id === item.cart_item_id)
       if (index !== -1) {
         cartItems.value.splice(index, 1)
+
+        // Reset animation states for remaining items
+        animateItems.value = animateItems.value.filter((_, idx) => idx !== index)
       }
 
 
@@ -185,6 +192,21 @@ const removeItemFromCart = async (item: CartItem) => {
     // Optional: show error message
   } finally {
     loading.value = false
+  }
+}
+
+// Add this function to handle animation setup
+const setupAnimation = (items: CartItem[]) => {
+  // Reset animation states
+  animateItems.value = new Array(items.length).fill(false)
+
+  // Stagger the animations
+  for (let i = 0; i < items.length; i++) {
+    setTimeout(() => {
+      if (i < animateItems.value.length) {
+        animateItems.value[i] = true
+      }
+    }, 100 + i * 100) // 100ms delay between each item
   }
 }
 </script>
@@ -408,6 +430,22 @@ h1 {
 @media (max-width: 768px) {
   .cart-actions {
     flex-direction: column;
+  }
+}
+
+/* Add these animation styles */
+.fade-in {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>
