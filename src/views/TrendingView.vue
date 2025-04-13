@@ -1,7 +1,7 @@
 <template>
   <div class="trending-container">
     <div class="header">
-      <h1>Trending Deals</h1>
+      <h1>Discover new deals</h1>
       <p class="subtitle">Discover what other shoppers are excited about</p>
     </div>
 

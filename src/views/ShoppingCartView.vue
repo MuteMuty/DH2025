@@ -1,6 +1,6 @@
 <template>
   <div class="cart-container">
-    <h1>Shopping Cart</h1>
+    <h1>Wishlist Cart</h1>
 
     <div v-if="loading" class="loading-container">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a90e2"></i>
@@ -9,9 +9,9 @@
 
     <div v-else-if="!cartItems.length" class="empty-cart">
       <i class="pi pi-shopping-cart" style="font-size: 3rem; color: #ccc"></i>
-      <h3>Your cart is empty</h3>
+      <h3>Your wishlist is empty</h3>
       <p>Discover amazing deals and add them to your cart!</p>
-      <Button label="Browse Deals" @click="$router.push('/')" />
+      <Button label="Browse Deals" @click="$router.push('/trending')" />
     </div>
 
     <div v-else class="cart-content">
