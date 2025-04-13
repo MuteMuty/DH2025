@@ -20,7 +20,9 @@
           :key="discountItem._id"
         >
           <div v-show="animateDeals[index]" class="card product-card fade-in">
-            <div class="discount-tag">-{{ discountItem.discount_percentage }}%</div>
+            <div v-if="discountItem.discount_percentage > 0" class="discount-tag">
+              -{{ discountItem.discount_percentage }}%
+            </div>
             <div class="store-tag">
               <img
                 :src="`/stores-imgs/${discountItem.store.toLowerCase()}-img.png`"
@@ -45,7 +47,56 @@
             </div>
             <Button
               icon="pi pi-shopping-cart"
-              :label="isInCart(discountItem) ? 'Already in Cart' : 'Add to Cart'"
+              :label="isInCart(discountItem) ? 'Already in Wishlist' : 'Add to Wishlist'"
+              :disabled="isInCart(discountItem)"
+              @click="store.addToCart(discountItem)"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="biggest-discounts-section">
+      <div class="section-header">
+        <h2>Biggest Discounts</h2>
+        <Button
+          label="See All"
+          icon="pi pi-arrow-right"
+          text
+          @click="$router.push('/biggest-discounts')"
+        />
+      </div>
+
+      <div class="grid">
+        <div
+          class="col-12 sm:col-6 lg:col-3"
+          v-for="(discountItem, index) in store.biggestDiscounts"
+          :key="discountItem._id"
+        >
+          <div v-show="animateBiggestDiscounts[index]" class="card product-card fade-in">
+            <div class="discount-tag">-{{ discountItem.discount_percentage }}%</div>
+            <div class="store-tag">
+              <img
+                :src="`/stores-imgs/${discountItem.store.toLowerCase()}-img.png`"
+                :alt="discountItem.store"
+                class="store-logo"
+              />
+              <span class="store-name">{{ discountItem.store }}</span>
+            </div>
+            <div class="product-details">
+              <h3>{{ discountItem.item_description }}</h3>
+              <div class="validity-period">
+                <i class="pi pi-calendar"></i>
+                <span>{{ formatDate(discountItem.offer_start_date) }} - {{ formatDate(discountItem.offer_end_date) }}</span>
+              </div>
+              <div class="price-container">
+                <span class="original-price">{{ getOgPrice(discountItem) }}€</span>
+                <span class="discount-price">{{ discountItem.discount_price.toFixed(2) }}€</span>
+              </div>
+            </div>
+            <Button
+              icon="pi pi-shopping-cart"
+              :label="isInCart(discountItem) ? 'Already in Wishlist' : 'Add to Wishlist'"
               :disabled="isInCart(discountItem)"
               @click="store.addToCart(discountItem)"
             />
@@ -82,27 +133,27 @@ const store = useAppStore()
 
 onMounted(async () => {
   store.loadTrendingItems()
+  store.loadBiggestDiscounts()
   store.getShoppingCart()
 })
 
-// Animation state
+// Animation states
 const animateDeals = ref([false, false, false, false])
+const animateBiggestDiscounts = ref([false, false, false, false])
 
 // Start animation sequence when component is mounted
 onMounted(() => {
-  // Animate deal cards with staggered delay
-  setTimeout(() => {
-    animateDeals.value[0] = true
-  }, 200)
-  setTimeout(() => {
-    animateDeals.value[1] = true
-  }, 400)
-  setTimeout(() => {
-    animateDeals.value[2] = true
-  }, 600)
-  setTimeout(() => {
-    animateDeals.value[3] = true
-  }, 800)
+  // Animate trending deals
+  setTimeout(() => { animateDeals.value[0] = true }, 200)
+  setTimeout(() => { animateDeals.value[1] = true }, 400)
+  setTimeout(() => { animateDeals.value[2] = true }, 600)
+  setTimeout(() => { animateDeals.value[3] = true }, 800)
+
+  // Animate biggest discounts with a slight delay
+  setTimeout(() => { animateBiggestDiscounts.value[0] = true }, 1000)
+  setTimeout(() => { animateBiggestDiscounts.value[1] = true }, 1200)
+  setTimeout(() => { animateBiggestDiscounts.value[2] = true }, 1400)
+  setTimeout(() => { animateBiggestDiscounts.value[3] = true }, 1600)
 })
 </script>
 
@@ -397,5 +448,9 @@ onMounted(() => {
   width: auto;
   margin-bottom: 1rem;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.biggest-discounts-section {
+  margin-bottom: 2rem;
 }
 </style>

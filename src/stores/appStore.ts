@@ -16,6 +16,7 @@ export const useAppStore = defineStore('appStore', () => {
   const shoppingCart = ref<Discounts[]>([])
   const searchResults = ref<Discounts[]>([])
   const trendingDiscounts = ref<Discounts[]>([])
+  const biggestDiscounts = ref<Discounts[]>([])
 
   const firebaseToken = ref<string | null>(null)
   const userId = ref<string | null>(null)
@@ -130,16 +131,30 @@ export const useAppStore = defineStore('appStore', () => {
     firebaseToken.value = token
   }
 
+  async function loadBiggestDiscounts() {
+    console.log('Loading biggest discounts')
+    try {
+      // Sort trending items by discount percentage for now
+      const items = [...trendingDiscounts.value]
+      items.sort((a, b) => b.discount_percentage - a.discount_percentage)
+      biggestDiscounts.value = items.slice(0, 4)
+    } catch (error) {
+      console.error('Error getting biggest discounts:', error)
+    }
+  }
+
   return {
     isNotificationVisible,
     trendingDiscounts,
     searchResults,
     shoppingCart,
+    biggestDiscounts,
     addToCart,
     removeFromCart, // Add this
     getShoppingCart,
     searchProducts,
     loadTrendingItems,
+    loadBiggestDiscounts,
     init,
   }
 })
