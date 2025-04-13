@@ -484,12 +484,19 @@ watch(
       // Calculate bundle options
       calculateCheapestItems()
       calculateCheapestStore()
+
+      // IMPORTANT: Keep the current bundle view even when search changes
+      // Only set bundleView to 'all' if there's only one search term now
+      if (searchTerms.value.length < 2) {
+        bundleView.value = 'all'
+      }
     } else {
       // Clear results if there's no query
       searchTerms.value = []
       store.searchResults = []
       filteredResults.value = []
       loading.value = false
+      bundleView.value = 'all'
     }
   },
   { immediate: true, deep: true }

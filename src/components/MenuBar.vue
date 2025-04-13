@@ -17,7 +17,6 @@
                 @keyup.enter="handleEnterKeyPress"
                 @input="handleSearchInput"
               />
-              <i class="pi pi-search"></i>
             </span>
             <!-- Add search terms display -->
             <div class="search-terms" v-if="searchTerms.length > 0">
