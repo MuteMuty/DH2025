@@ -41,7 +41,7 @@
             </OverlayPanel>
 
             <Button
-              icon="pi pi-plus"
+              icon="pi pi-filter"
               class="store-button"
               aria-label="Select Stores"
               @click="toggleStoreMenu"
@@ -54,6 +54,16 @@
         </div>
       </template>
       <template #end>
+        <div class="notification-button">
+          <Toast />
+          <Button
+            @click="toggleNotification"
+            icon="pi pi-bell"
+            rounded
+            text
+            badgeClass="p-badge-danger"
+          />
+        </div>
         <div class="cart-container">
           <router-link to="/shopping-cart" class="cart-link">
             <Button icon="pi pi-shopping-cart" rounded text badge="2" badgeClass="p-badge-danger" />
@@ -71,7 +81,11 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import Checkbox from 'primevue/checkbox'
 import OverlayPanel from 'primevue/overlaypanel'
+import Toast from 'primevue/toast'
 import { useRouter, useRoute } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
+import { useAppStore } from '../stores/appStore'
+const toast = useToast()
 
 const router = useRouter()
 const route = useRoute()
@@ -142,27 +156,22 @@ const handleSearchInput = (event: any) => {
   }
 }
 
-// For backwards compatibility, keeping the original function name but calling our new handler
-const onSearchInput = handleSearchInput
-
-// const searchProducts = () => {
-//   if (searchQuery.value.trim()) {
-//     const query = { q: searchQuery.value }
-
-//     if (selectedStores.value.length > 0) {
-//       query.stores = selectedStores.value.join(',')
-//     }
-
-//     router.push({
-//       path: '/search',
-//       query,
-//     })
-//     searchQuery.value = ''
-//   }
-// }
-
 const toggleStoreMenu = (event: MouseEvent) => {
   storeOverlay.value.toggle(event)
+}
+
+const toggleNotification = () => {
+  console.log('toggleNotification')
+  toast.add({
+    severity: 'info',
+    summary: 'Notifications',
+    detail: 'Enabled notifications for discount',
+    life: 3000,
+  })
+
+  setTimeout(() => {
+    useAppStore().isNotificationVisible = true
+  }, 6000)
 }
 </script>
 
@@ -195,7 +204,7 @@ const toggleStoreMenu = (event: MouseEvent) => {
 }
 
 .nav-link {
-  color: #2C2C2C;
+  color: var(--text-color);
   text-decoration: none;
   padding: 0.5rem 1rem;
   font-weight: 600;
@@ -244,7 +253,7 @@ const toggleStoreMenu = (event: MouseEvent) => {
 .search-container {
   width: 100%;
   max-width: 500px;
-  margin-right: 0.75rem;
+  margin-right: 0.5rem;
 }
 
 .search-container .p-inputtext {
@@ -284,10 +293,8 @@ const toggleStoreMenu = (event: MouseEvent) => {
 }
 
 .store-button {
-  height: 2.75rem;
-  width: 2.75rem;
-  color: #2C2C2C;
-  transition: background-color 0.2s, color 0.2s;
+  height: 2.5rem;
+  width: 5rem;
 }
 
 .store-button:hover {
@@ -309,7 +316,7 @@ const toggleStoreMenu = (event: MouseEvent) => {
 }
 
 .cart-link {
-  color: #2C2C2C;
+  color: #2c2c2c;
   transition: color 0.2s;
   display: flex;
   align-items: center;
@@ -345,7 +352,7 @@ const toggleStoreMenu = (event: MouseEvent) => {
   height: 1.4rem;
   font-size: 0.8rem;
   font-weight: 600;
-  background-color: #FF6B6B;
+  background-color: #ff6b6b;
   box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
   transform: scale(1);
   transition: all 0.3s ease;
@@ -358,50 +365,26 @@ const toggleStoreMenu = (event: MouseEvent) => {
 .store-checkbox-container {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  padding: 0.5rem 0;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .store-checkbox-item {
   display: flex;
   align-items: center;
-  padding: 0.5rem;
-  border-radius: 6px;
+  padding: 0.25rem;
 }
 
 .store-checkbox-item:hover {
-  background-color: rgba(74, 144, 226, 0.05);
+  background-color: var(--surface-hover);
+  border-radius: 4px;
 }
 
 .store-actions {
   display: flex;
   justify-content: space-between;
-  padding-top: 0.75rem;
-  border-top: 1px solid #E0E0E0;
-}
-
-:deep(.store-actions .p-button-text) {
-  color: #4A90E2;
-}
-
-:deep(.store-actions .p-button-text:hover) {
-  background-color: rgba(74, 144, 226, 0.1);
-}
-
-:deep(.p-overlaypanel) {
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid #E0E0E0;
-}
-
-:deep(.p-overlaypanel:before, .p-overlaypanel:after) {
-  border-bottom-color: #FFFFFF;
-}
-
-:deep(.p-checkbox-box.p-highlight) {
-  border-color: #4A90E2;
-  background-color: #4A90E2;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--surface-border);
 }
 
 @media (min-width: 768px) {
@@ -423,7 +406,7 @@ const toggleStoreMenu = (event: MouseEvent) => {
 
 @media (max-width: 768px) {
   .navigation-links {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     margin-right: 0;
   }
 
@@ -438,7 +421,7 @@ const toggleStoreMenu = (event: MouseEvent) => {
   }
 
   .store-selector {
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
     justify-content: flex-end;
   }
 

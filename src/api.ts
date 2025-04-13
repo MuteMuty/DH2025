@@ -60,9 +60,7 @@ export const getTrendingItemsApi = async (): Promise<Discounts[]> => {
 // Shopping Cart operations
 export const getCartItemsApi = async (userId: string): Promise<Discounts[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/shoppingCart`, {
-      params: { userId },
-    })
+    const response = await axios.get(`${API_BASE_URL}/shopping-cart/${userId}`);
     return response.data
   } catch (error) {
     console.error('Error fetching cart items:', error)
@@ -72,14 +70,16 @@ export const getCartItemsApi = async (userId: string): Promise<Discounts[]> => {
 
 export const addToCartApi = async (userId: string, discountId: Discounts['_id']): Promise<void> => {
   try {
-    await axios.post(`${API_BASE_URL}/shoppingCart`, {
-      userId,
-      discountId,
+    await axios.post(`${API_BASE_URL}/shopping-cart`, {
+      user_id: userId,
+      discount_id: discountId,
     })
   } catch (error) {
     console.error('Error adding to cart:', error)
     throw error
   }
+  console.log('UserID:', userId)
+  console.log('DiscountID:', discountId)
 }
 
 export const notificationsSignUpApi = async (

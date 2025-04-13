@@ -16,6 +16,8 @@ import 'primeicons/primeicons.css' // Icons
 import Aura from '@primeuix/themes/aura' // Aura theme preset
 import { useAppStore } from './stores/appStore'
 
+import ToastService from 'primevue/toastservice'
+
 const app = createApp(App)
 
 app.use(createPinia())
@@ -25,6 +27,8 @@ app.use(PrimeVue, {
     preset: Aura,
   },
 })
+app.use(ToastService)
+
 app.component('Button', Button)
 app.component('InputText', InputText)
 app.component('Checkbox', Checkbox)

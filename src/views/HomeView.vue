@@ -27,8 +27,8 @@
           <div v-show="animateDeals[index]" class="card product-card fade-in">
             <div class="discount-tag">-{{ discountItem.discount_percentage }}%</div>
             <div class="store-tag">
-              <img 
-                :src="`/stores-imgs/${discountItem.store.toLowerCase()}-img.png`" 
+              <img
+                :src="`/stores-imgs/${discountItem.store.toLowerCase()}-img.png`"
                 :alt="discountItem.store"
                 class="store-logo"
               />
@@ -38,7 +38,10 @@
               <h3>{{ discountItem.item_description }}</h3>
               <div class="validity-period">
                 <i class="pi pi-calendar"></i>
-                <span>{{ formatDate(discountItem.offer_start_date) }} - {{ formatDate(discountItem.offer_end_date) }}</span>
+                <span
+                  >{{ formatDate(discountItem.offer_start_date) }} -
+                  {{ formatDate(discountItem.offer_end_date) }}</span
+                >
               </div>
               <div class="price-container">
                 <span class="original-price">{{ getOgPrice(discountItem) }}€</span>
@@ -47,7 +50,8 @@
             </div>
             <Button
               icon="pi pi-shopping-cart"
-              label="Add to Cart"
+              :label="isInCart(discountItem) ? 'Already in Cart' : 'Add to Cart'"
+              :disabled="isInCart(discountItem)"
               @click="store.addToCart(discountItem)"
             />
           </div>
@@ -72,11 +76,18 @@ function formatDate(dateString: string): string {
   return `${date.getDate()}.${date.getMonth() + 1}`
 }
 
+function isInCart(discountItem: Discounts) {
+  console.log('store.shoppingCart', store.shoppingCart)
+  // @ts-ignore
+  return store.shoppingCart.some((item) => item.discount._id === discountItem._id)
+}
+
 const router = useRouter()
 const store = useAppStore()
 
 onMounted(async () => {
   store.loadTrendingItems()
+  store.getShoppingCart()
 })
 
 // Animation state
@@ -114,15 +125,17 @@ onMounted(() => {
   border-radius: 16px;
   margin: 1rem auto 2rem;
   max-width: 1400px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .hero-content h1 {
   font-size: 2.5rem;
   margin-bottom: 0.25rem;
-  color: #2C2C2C;
+  color: #2c2c2c;
   font-weight: 700;
-  background: linear-gradient(120deg, #2C2C2C 0%, #4caf50 100%);
+  background: linear-gradient(120deg, #2c2c2c 0%, #4caf50 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -131,7 +144,40 @@ onMounted(() => {
 
 .subtitle {
   font-size: 1.2rem;
-  color: #666;
+  color: #6c757d;
+  margin-bottom: 2rem;
+}
+
+.search-box .p-inputtext {
+  flex-grow: 1;
+  margin-right: 0.5rem;
+}
+
+.nav-cards-section {
+  margin-bottom: 2rem;
+}
+
+.nav-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem;
+  cursor: pointer;
+  height: 100%;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.nav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header i {
+  font-size: 2.5rem;
+  color: var(--primary-color, #4caf50);
   margin-bottom: 1rem;
   font-weight: 500;
 }
@@ -204,7 +250,7 @@ onMounted(() => {
 .store-name {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #2C2C2C;
+  color: #2c2c2c;
 }
 
 /* Remove the old store color classes since we're using images now */
@@ -227,7 +273,7 @@ onMounted(() => {
   font-weight: 600;
   margin-bottom: 0.5rem;
   line-height: 1.3;
-  color: #2C2C2C;
+  color: #2c2c2c;
 }
 
 .validity-period {

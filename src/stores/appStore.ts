@@ -19,8 +19,12 @@ export const useAppStore = defineStore('appStore', () => {
   const firebaseToken = ref<string | null>(null)
   const userId = ref<string | null>(null)
 
+  const isNotificationVisible = ref(false)
+
   async function addToCart(discountItem: Discounts) {
     try {
+      console.log('Adding to cart:', discountItem)
+      console.log('User ID:', userId.value)
       if (!userId.value) {
         throw new Error('User ID is not set')
       }
@@ -90,6 +94,7 @@ export const useAppStore = defineStore('appStore', () => {
 
   async function init() {
     userId.value = getOrCreateUserId()
+    console.log('User ID:', userId.value)
     initFirebase()
     const token = await initMessagingAndRequestNotificationPermission()
     if (!token) {
@@ -99,6 +104,7 @@ export const useAppStore = defineStore('appStore', () => {
   }
 
   return {
+    isNotificationVisible,
     trendingDiscounts,
     searchResults,
     shoppingCart,
