@@ -838,4 +838,45 @@ h1 {
     max-width: 300px;
   }
 }
+
+/* Add these styles for the bundle description section */
+.bundle-description {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background: rgba(74, 144, 226, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(74, 144, 226, 0.2);
+}
+
+.description-content {
+  position: relative;
+  padding-left: 1.25rem;
+  border-left: 4px solid #4a90e2;
+}
+
+.description-content p {
+  color: #4a90e2;
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin: 0 0 1rem 0;
+}
+
+.savings {
+  color: #4a90e2;
+  font-size: 1.2rem;
+}
+
+.savings-amount, .store-name-highlight {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #4a90e2;
+}
+
+.bundle-active-bar {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(74, 144, 226, 0.2);
+  display: flex;
+  justify-content: flex-end;
+}
 </style>
