@@ -2,6 +2,7 @@
   <div class="menu-bar">
     <Menubar>
       <template #start>
+        <img src="/small-logo.png" alt="The Saving Grace" class="nav-logo" />
         <div class="navigation-links">
           <router-link to="/" class="nav-link">Home</router-link>
           <router-link to="/trending" class="nav-link">Trending</router-link>
@@ -9,12 +10,15 @@
         <div class="menubar-content">
           <!-- Search without icon -->
           <div class="search-container">
-            <InputText
-              v-model="searchQuery"
-              placeholder="Search for products..."
-              @keyup.enter="() => {}"
-              @input="handleSearchInput"
-            />
+            <span class="p-input-icon-right">
+              <InputText
+                v-model="searchQuery"
+                placeholder="Search for products..."
+                @keyup.enter="() => {}"
+                @input="handleSearchInput"
+              />
+              <i class="pi pi-search" />
+            </span>
           </div>
 
           <!-- Store selector as a dropdown with checkboxes -->
@@ -165,15 +169,23 @@ const toggleStoreMenu = (event: MouseEvent) => {
 <style scoped>
 .menu-bar {
   width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 :deep(.p-menubar) {
   display: flex;
   justify-content: space-between;
   padding: 0.75rem 1.5rem;
-  background-color: #FFFFFF;
+  background-color: transparent;
   border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .navigation-links {
@@ -186,19 +198,36 @@ const toggleStoreMenu = (event: MouseEvent) => {
   color: #2C2C2C;
   text-decoration: none;
   padding: 0.5rem 1rem;
-  font-weight: 500;
-  transition: color 0.2s, background-color 0.2s;
-  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #4caf50;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-link:hover::after,
+.nav-link.router-link-active::after {
+  width: 80%;
 }
 
 .nav-link:hover {
-  color: #4A90E2;
-  background-color: rgba(74, 144, 226, 0.05);
+  color: #4caf50;
+  transform: translateY(-1px);
 }
 
 .nav-link.router-link-active {
-  color: #4A90E2;
-  font-weight: 600;
+  color: #4caf50;
 }
 
 .nav-link + .nav-link {
@@ -220,19 +249,33 @@ const toggleStoreMenu = (event: MouseEvent) => {
 
 .search-container .p-inputtext {
   width: 100%;
-  border-radius: 8px;
-  border: 1px solid #E0E0E0;
+  border-radius: 12px;
+  border: 2px solid rgba(76, 175, 80, 0.2);
   padding: 0.75rem 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.search-container .p-inputtext:hover {
-  border-color: #4A90E2;
+  padding-right: 2.5rem;
+  transition: all 0.3s ease;
+  background: white;
+  font-size: 0.95rem;
 }
 
 .search-container .p-inputtext:focus {
-  border-color: #4A90E2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  border-color: #4caf50;
+  box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.1);
+  transform: translateY(-1px);
+}
+
+.search-container .p-input-icon-right i {
+  color: #4caf50;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0.75rem;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.search-container .p-inputtext:focus + i {
+  transform: translateY(-50%) scale(1.1);
 }
 
 .store-selector {
@@ -248,38 +291,68 @@ const toggleStoreMenu = (event: MouseEvent) => {
 }
 
 .store-button:hover {
-  background-color: rgba(74, 144, 226, 0.1);
-  color: #4A90E2;
+  color: #4caf50;
+  background-color: rgba(76, 175, 80, 0.1);
 }
 
 .cart-container {
+  margin-left: 1rem;
+  background: rgba(76, 175, 80, 0.1);
+  padding: 0.5rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.cart-container:hover {
+  background: rgba(76, 175, 80, 0.15);
+  transform: translateY(-2px);
+}
+
+.cart-link {
+  color: #2C2C2C;
+  transition: color 0.2s;
   display: flex;
   align-items: center;
 }
 
-.cart-link {
-  text-decoration: none;
-  color: inherit;
+.cart-link:hover {
+  color: #4caf50;
+}
+
+.cart-link :deep(.p-button) {
+  width: 3rem;
+  height: 3rem;
+  background: white;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.cart-link :deep(.p-button:hover) {
+  background: white;
+  transform: scale(1.05);
+}
+
+.cart-link :deep(.p-button .p-button-icon) {
+  font-size: 1.4rem;
+  color: #4caf50;
+  transition: all 0.3s ease;
 }
 
 :deep(.p-badge) {
-  min-width: 1.2rem;
-  height: 1.2rem;
-  font-size: 0.7rem;
-  background-color: #4A90E2;
-}
-
-:deep(.p-badge-danger) {
+  min-width: 1.4rem;
+  height: 1.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   background-color: #FF6B6B;
+  box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+  transform: scale(1);
+  transition: all 0.3s ease;
 }
 
-:deep(.p-badge-secondary) {
-  background-color: #E0E0E0;
-  color: #2C2C2C;
-}
-
-:deep(.p-badge-primary) {
-  background-color: #4A90E2;
+.cart-container:hover :deep(.p-badge) {
+  transform: scale(1.1);
 }
 
 .store-checkbox-container {
@@ -372,5 +445,31 @@ const toggleStoreMenu = (event: MouseEvent) => {
   .search-container {
     margin-right: 0;
   }
+
+  .nav-logo {
+    height: 38px;
+    margin-right: 1rem;
+  }
+}
+
+.logo-link {
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.logo-link::after {
+  display: none;
+}
+
+.nav-logo {
+  height: 45px;
+  width: auto;
+  margin-right: 2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.logo-link:hover .nav-logo {
+  transform: scale(1.05);
 }
 </style>

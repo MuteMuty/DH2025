@@ -2,40 +2,8 @@
   <div class="home-container">
     <section class="hero-section">
       <div class="hero-content">
-        <h1>The Saving Grace</h1>
+        <img src="/SavingGrace-logo.png" alt="The Saving Grace" class="hero-logo" />
         <p class="subtitle">Because buying full price is a sin</p>
-        <div class="search-box">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText
-              v-model="searchQuery"
-              placeholder="Search for products..."
-              @keyup.enter="searchProducts"
-            />
-          </span>
-          <Button label="Search" icon="pi pi-search" @click="searchProducts" />
-        </div>
-      </div>
-    </section>
-
-    <section class="nav-cards-section">
-      <div class="grid">
-        <div class="col-12 md:col-4" v-for="(item, index) in navItems" :key="item.label">
-          <!-- Add animation with staggered delay -->
-          <div
-            v-show="animateNav[index]"
-            class="card nav-card fade-in"
-            @click="$router.push(item.route)"
-          >
-            <div class="card-header">
-              <i :class="item.icon" />
-            </div>
-            <div class="card-body">
-              <h3>{{ item.label }}</h3>
-              <p>{{ item.description }}</p>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -56,14 +24,22 @@
           v-for="(discountItem, index) in store.trendingDiscounts"
           :key="discountItem._id"
         >
-          <!-- Add animation with staggered delay -->
           <div v-show="animateDeals[index]" class="card product-card fade-in">
             <div class="discount-tag">-{{ discountItem.discount_percentage }}%</div>
-            <div class="store-tag" :class="`store-${discountItem.store}`">
-              {{ discountItem.store }}
+            <div class="store-tag">
+              <img 
+                :src="`/stores-imgs/${discountItem.store.toLowerCase()}-img.png`" 
+                :alt="discountItem.store"
+                class="store-logo"
+              />
+              <span class="store-name">{{ discountItem.store }}</span>
             </div>
             <div class="product-details">
               <h3>{{ discountItem.item_description }}</h3>
+              <div class="validity-period">
+                <i class="pi pi-calendar"></i>
+                <span>{{ formatDate(discountItem.offer_start_date) }} - {{ formatDate(discountItem.offer_end_date) }}</span>
+              </div>
               <div class="price-container">
                 <span class="original-price">{{ getOgPrice(discountItem) }}€</span>
                 <span class="discount-price">{{ discountItem.discount_price.toFixed(2) }}€</span>
@@ -78,127 +54,49 @@
         </div>
       </div>
     </section>
-
-    <section class="stores-section">
-      <h2>Popular Stores</h2>
-      <div class="stores-grid">
-        <div
-          v-for="(store, index) in stores"
-          :key="store"
-          v-show="animateStores[index]"
-          class="store-item fade-in"
-          @click="$router.push(`/search?store=${store}`)"
-        >
-          <div class="store-logo" :class="`bg-${store.toLowerCase()}`">
-            <span>{{ store[0] }}</span>
-          </div>
-          <span class="store-name">{{ store }}</span>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import InputText from 'primevue/inputtext'
 import { useAppStore } from '@/stores/appStore'
-import { Store, type Discounts } from '@/types'
+import { type Discounts } from '@/types'
 
 function getOgPrice(discountItem: Discounts) {
   return (discountItem.discount_price / (1 - discountItem.discount_percentage / 100)).toFixed(2)
 }
 
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  return `${date.getDate()}.${date.getMonth() + 1}`
+}
+
 const router = useRouter()
 const store = useAppStore()
-
-const searchQuery = ref('')
 
 onMounted(async () => {
   store.loadTrendingItems()
 })
 
 // Animation state
-const animateNav = ref([false, false, false])
 const animateDeals = ref([false, false, false, false])
-const animateStores = ref([false, false, false, false])
-
-// Navigation items for the cards section
-const navItems = [
-  {
-    label: 'Shopping Cart',
-    icon: 'pi pi-shopping-cart',
-    route: '/shopping-cart',
-    description: 'View and manage items in your cart',
-  },
-  {
-    label: 'Trending Deals',
-    icon: 'pi pi-trending-up',
-    route: '/trending',
-    description: 'See what products are trending now',
-  },
-  {
-    label: 'Search Products',
-    icon: 'pi pi-search',
-    route: '/search',
-    description: 'Find products across all stores',
-  },
-]
-
-// Mock data for stores
-const stores = ref<Store[]>([Store.Lidl, Store.Hofer, Store.Spar, Store.Mercator, Store.Eurospin])
-
-// Function to handle search
-const searchProducts = () => {
-  if (searchQuery.value.trim()) {
-    router.push({
-      path: '/search',
-      query: { q: searchQuery.value },
-    })
-  }
-}
 
 // Start animation sequence when component is mounted
 onMounted(() => {
-  // Animate navigation cards with staggered delay
-  setTimeout(() => {
-    animateNav.value[0] = true
-  }, 200)
-  setTimeout(() => {
-    animateNav.value[1] = true
-  }, 400)
-  setTimeout(() => {
-    animateNav.value[2] = true
-  }, 600)
-
   // Animate deal cards with staggered delay
   setTimeout(() => {
     animateDeals.value[0] = true
-  }, 800)
+  }, 200)
   setTimeout(() => {
     animateDeals.value[1] = true
-  }, 1000)
+  }, 400)
   setTimeout(() => {
     animateDeals.value[2] = true
-  }, 1200)
+  }, 600)
   setTimeout(() => {
     animateDeals.value[3] = true
-  }, 1400)
-
-  // Animate stores with staggered delay
-  setTimeout(() => {
-    animateStores.value[0] = true
-  }, 1600)
-  setTimeout(() => {
-    animateStores.value[1] = true
-  }, 1700)
-  setTimeout(() => {
-    animateStores.value[2] = true
-  }, 1800)
-  setTimeout(() => {
-    animateStores.value[3] = true
-  }, 1900)
+  }, 800)
 })
 </script>
 
@@ -210,70 +108,32 @@ onMounted(() => {
 }
 
 .hero-section {
-  padding: 3rem 1rem;
+  padding: 1.5rem 1rem;
   text-align: center;
-  background: linear-gradient(to right, #f8f9fa, #e9ecef);
-  border-radius: 8px;
-  margin-bottom: 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  margin: 1rem auto 2rem;
+  max-width: 1400px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .hero-content h1 {
   font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--primary-color, #4caf50);
+  margin-bottom: 0.25rem;
+  color: #2C2C2C;
+  font-weight: 700;
+  background: linear-gradient(120deg, #2C2C2C 0%, #4caf50 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .subtitle {
   font-size: 1.2rem;
-  color: #6c757d;
-  margin-bottom: 2rem;
-}
-
-.search-box {
-  display: flex;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.search-box .p-inputtext {
-  flex-grow: 1;
-  margin-right: 0.5rem;
-}
-
-.nav-cards-section {
-  margin-bottom: 2rem;
-}
-
-.nav-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 1.5rem;
-  cursor: pointer;
-  height: 100%;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-}
-
-.nav-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.card-header i {
-  font-size: 2.5rem;
-  color: var(--primary-color, #4caf50);
+  color: #666;
   margin-bottom: 1rem;
-}
-
-.card-body h3 {
-  margin-bottom: 0.5rem;
-}
-
-.card-body p {
-  color: #6c757d;
+  font-weight: 500;
 }
 
 .section-header {
@@ -283,8 +143,7 @@ onMounted(() => {
   margin-bottom: 1rem;
 }
 
-.trending-section,
-.stores-section {
+.trending-section {
   margin-bottom: 2rem;
 }
 
@@ -292,55 +151,70 @@ onMounted(() => {
   position: relative;
   padding: 1.5rem;
   height: 100%;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: all 0.3s ease;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  overflow: visible;
 }
 
 .product-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .discount-tag {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -12px;
+  right: -12px;
   background: #ff5252;
   color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0 4px 0 4px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: bold;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 8px rgba(255, 82, 82, 0.3);
+  z-index: 1;
+  transform: rotate(12deg);
 }
 
 .store-tag {
   position: absolute;
   top: 0;
   left: 0;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px 0 4px 0;
-  color: white;
-  font-weight: bold;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 16px 0;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.store-Lidl {
-  background: #0050aa;
+.store-logo {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
 }
 
-.store-Hofer {
-  background: #e30613;
+.store-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2C2C2C;
 }
 
-.store-Spar {
-  background: #008c45;
-}
-
-.store-Mercator {
-  background: #ce1126;
-}
-
+/* Remove the old store color classes since we're using images now */
+.store-Lidl,
+.store-Hofer,
+.store-Spar,
+.store-Mercator,
 .store-Eurospin {
-  background: #0050aa;
+  background: transparent;
+  color: transparent;
 }
 
 .product-details {
@@ -348,111 +222,57 @@ onMounted(() => {
   color: black;
 }
 
-.price-container {
+.product-details h3 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+  color: #2C2C2C;
+}
+
+.validity-period {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
+  margin: 0.75rem 0;
+  color: #666;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 8px;
+}
+
+.validity-period i {
+  color: #4caf50;
+}
+
+.price-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(76, 175, 80, 0.05);
+  border-radius: 12px;
 }
 
 .original-price {
   text-decoration: line-through;
   color: #6c757d;
+  font-size: 1.2rem;
+  opacity: 0.7;
 }
 
 .discount-price {
-  font-weight: bold;
+  font-weight: 700;
   color: #4caf50;
-  font-size: 1.2rem;
-}
-
-.stores-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.store-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  padding: 1rem;
+  font-size: 1.8rem;
+  padding: 0.25rem 0.75rem;
   border-radius: 8px;
-  transition: background-color 0.2s;
-}
-
-.store-item:hover {
-  background-color: #f8f9fa;
-}
-
-.store-logo {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.5rem;
-  color: white;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.bg-lidl {
-  background-color: #0050aa;
-}
-
-.bg-hofer {
-  background-color: #e30613;
-}
-
-.bg-spar {
-  background-color: #008c45;
-}
-
-.bg-mercator {
-  background-color: #ce1126;
-}
-
-.store-name {
-  font-weight: bold;
-}
-
-/* Animation styles */
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-  transition:
-    opacity 0.5s,
-    transform 0.5s;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-content h1 {
-    font-size: 2rem;
-  }
-
-  .search-box {
-    flex-direction: column;
-  }
-
-  .search-box .p-inputtext {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
-  }
+  background: white;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
 }
 
 .grid {
@@ -482,11 +302,6 @@ onMounted(() => {
     flex: 0 0 25%;
     max-width: 25%;
   }
-
-  .md\:col-4 {
-    flex: 0 0 33.3333%;
-    max-width: 33.3333%;
-  }
 }
 
 .card {
@@ -494,5 +309,47 @@ onMounted(() => {
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
   padding: 1rem;
+}
+
+/* Animation styles */
+.fade-in {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .search-box {
+    flex-direction: column;
+  }
+
+  .search-box .p-inputtext {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-logo {
+    height: 80px;
+  }
+}
+
+.hero-logo {
+  height: 120px;
+  width: auto;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
 }
 </style>
