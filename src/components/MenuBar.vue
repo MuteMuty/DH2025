@@ -2,10 +2,10 @@
   <div class="menu-bar">
     <Menubar>
       <template #start>
-        <img src="/small-logo.png" alt="The Saving Grace" class="nav-logo" />
+        <img src="/Benis4.png" alt="The Saving Grace" class="nav-logo" />
         <div class="navigation-links">
           <router-link to="/" class="nav-link">Home</router-link>
-          <router-link to="/trending" class="nav-link">Trending</router-link>
+
         </div>
         <div class="menubar-content">
           <!-- Search without icon -->
@@ -17,7 +17,7 @@
                 @keyup.enter="() => {}"
                 @input="handleSearchInput"
               />
-              <i class="pi pi-search" />
+
             </span>
           </div>
 
@@ -66,7 +66,15 @@
         </div>
         <div class="cart-container">
           <router-link to="/shopping-cart" class="cart-link">
-            <Button icon="pi pi-shopping-cart" rounded text badge="2" badgeClass="p-badge-danger" />
+            <Button
+              :icon="isCartRoute || isCartHovered ? 'pi pi-star-fill' : 'pi pi-star'"
+              rounded
+              text
+              :badge="cartCount > 0 ? cartCount.toString() : ''"
+              badgeClass="p-badge-danger"
+              @mouseenter="isCartHovered = true"
+              @mouseleave="isCartHovered = false"
+            />
           </router-link>
         </div>
       </template>
@@ -75,7 +83,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Menubar from 'primevue/menubar'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
@@ -173,6 +181,24 @@ const toggleNotification = () => {
     useAppStore().isNotificationVisible = true
   }, 6000)
 }
+
+// Add these new reactive variables
+const isCartHovered = ref(false)
+const store = useAppStore()
+const isCartRoute = computed(() => route.name === 'shopping-cart')
+
+// Add cart count computed property to show the actual number of items
+const cartCount = computed(() => {
+  if (!store.shoppingCart || !Array.isArray(store.shoppingCart)) {
+    return 0
+  }
+  return store.shoppingCart.length
+})
+
+// Initialize cart data when component is mounted
+onMounted(async () => {
+  await store.getShoppingCart()
+})
 </script>
 
 <style scoped>
@@ -324,10 +350,11 @@ const toggleNotification = () => {
 
 .cart-link:hover {
   color: #4caf50;
+
 }
 
 .cart-link :deep(.p-button) {
-  width: 3rem;
+  width: 5rem;
   height: 3rem;
   background: white;
   border: none;
