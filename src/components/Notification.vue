@@ -13,7 +13,7 @@
 
         <div class="product-info">
           <div class="product-header">
-            <p class="item-name">🍌 {{ discountItem.item_description }}</p>
+            <p class="item-name">🍺 {{ discountItem.item_description }}</p>
             <p class="store-name">{{ discountItem.store }}</p>
           </div>
 
@@ -45,14 +45,14 @@ const router = useRouter()
 
 const discountItem: Discounts = {
   _id: '1',
-  item_description: 'Banane',
-  discount_price: 1.15,
-  discount_percentage: 40,
-  store: Store.Lidl,
-  offer_start_date: '2021-01-01',
-  offer_end_date: '2021-01-01',
+  item_description: 'Pivo Laško Zlatorog 0.5L',
+  discount_price: 0.89,
+  discount_percentage: 25,
+  store: Store.Mercator,
+  offer_start_date: '2025-04-10',
+  offer_end_date: '2025-04-17',
   trending_score: 10,
-  quantity: '1 kg',
+  quantity: '0.5 L',
   bounding_box: {
     x: 10,
     y: 10,
