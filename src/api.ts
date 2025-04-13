@@ -6,45 +6,45 @@ const API_BASE_URL = 'https://goldfish-app-w3ydc.ondigitalocean.app/api'
 
 // Search products
 export const searchProductsApi = async (query: {
-  name?: string;
-  orderBy?: string;
-  sortOrder?: 'asc' | 'desc';
-  limit?: number;
-  q?: string;
+  name?: string
+  orderBy?: string
+  sortOrder?: 'asc' | 'desc'
+  limit?: number
+  q?: string
 }): Promise<Discounts[]> => {
   try {
     console.log('API search request with params:', query)
     // Make sure we're sending the right parameters
-    const params: Record<string, string | number | undefined> = {};
+    const params: Record<string, string | number | undefined> = {}
 
     if (query.name) {
-      params.query = query.name; // API expects 'q' parameter
+      params.query = query.name // API expects 'q' parameter
     }
     if (query.q) {
-      params.q = query.q;
+      params.q = query.q
     }
     if (query.orderBy) {
-      params.orderBy = query.orderBy;
+      params.orderBy = query.orderBy
     }
     if (query.sortOrder) {
-      params.sortOrder = query.sortOrder;
+      params.sortOrder = query.sortOrder
     }
     if (query.limit) {
-      params.limit = query.limit;
+      params.limit = query.limit
     }
 
     const response = await axios.get(`${API_BASE_URL}/search`, {
-      params
-    });
-    console.log('API search response:', response.data);
+      params,
+    })
+    console.log('API search response:', response.data)
 
     // Process the response to handle both formats and ensure consistent output
-    const items = response.data.items || response.data;
+    const items = response.data.items || response.data
 
-    return Array.isArray(items) ? items : [];
+    return Array.isArray(items) ? items : []
   } catch (error) {
-    console.error('Error searching products:', error);
-    throw error;
+    console.error('Error searching products:', error)
+    throw error
   }
 }
 
@@ -60,7 +60,7 @@ export const getTrendingItemsApi = async (): Promise<Discounts[]> => {
 // Shopping Cart operations
 export const getCartItemsApi = async (userId: string): Promise<Discounts[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/shopping-cart/${userId}`);
+    const response = await axios.get(`${API_BASE_URL}/shopping-cart/${userId}`)
     return response.data
   } catch (error) {
     console.error('Error fetching cart items:', error)

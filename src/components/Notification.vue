@@ -8,22 +8,25 @@
     header="New discount found!"
   >
     <template v-if="discountItem">
-      <div class="flex justify-content-between align-items-center">
-        <p class="m-0">An item from you wishlist is on sale now!</p>
-        <div class="top-row">
-          <p class="item-name">🍌 {{ discountItem.item_description }}</p>
-          <p class="m-0">{{ discountItem.store }}</p>
-        </div>
-        <div class="bottom-row">
-          <p class="m-0">
-            <span class="discount-price">€{{ discountItem.discount_price.toFixed(2) }}</span>
-            <span class="discount-percentage">-{{ discountItem.discount_percentage }}%</span>
-          </p>
-          <p class="m-0">
+      <div class="notification-container">
+        <p class="notification-message">An item from your wishlist is on sale now!</p>
+
+        <div class="product-info">
+          <div class="product-header">
+            <p class="item-name">🍌 {{ discountItem.item_description }}</p>
+            <p class="store-name">{{ discountItem.store }}</p>
+          </div>
+
+          <div class="price-container">
+            <div class="discount-info">
+              <span class="discount-price">€{{ discountItem.discount_price.toFixed(2) }}</span>
+              <span class="discount-percentage">-{{ discountItem.discount_percentage }}%</span>
+            </div>
             <span class="original-price">€{{ calculateOriginalPrice() }}</span>
-          </p>
+          </div>
         </div>
-        <Button @click="seeMore" label="See more!" class="w-full" />
+
+        <Button @click="seeMore" label="See more!" class="see-more-btn" />
       </div>
     </template>
   </Dialog>
@@ -73,39 +76,78 @@ const calculateOriginalPrice = () => {
 </script>
 
 <style scoped>
-.discount-percentage {
-  background-color: #f0f0f0;
-  color: #ff0000;
-  padding: 4px 8px;
-  border-radius: 4px;
+.notification-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.discount-price {
-  font-weight: bold;
-  font-size: 1.2rem;
+.notification-message {
+  font-size: 1rem;
+  color: #4d4d4d;
+  margin: 0;
 }
 
-.original-price {
-  text-decoration: line-through;
-  color: #6c757d;
+.product-info {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .item-name {
   font-size: 1.2rem;
   font-weight: bold;
+  margin: 0;
 }
 
-.top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  font-size: 1.2rem;
+.store-name {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
 }
 
-.bottom-row {
+.price-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.discount-info {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.discount-price {
+  font-weight: bold;
+  font-size: 1.3rem;
+  color: #212121;
+}
+
+.discount-percentage {
+  background-color: #ffeeee;
+  color: #e53935;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.see-more-btn {
+  width: 100%;
+  margin-top: 0.5rem;
 }
 </style>

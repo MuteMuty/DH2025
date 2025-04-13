@@ -1,4 +1,4 @@
-import {  ref } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Discounts } from '@/types'
 import {
@@ -38,17 +38,14 @@ export const useAppStore = defineStore('appStore', () => {
 
   async function removeFromCart(cartItemId: string) {
     try {
-
       if (!userId.value) {
         userId.value = getOrCreateUserId()
       }
       await removeFromCartApi(userId.value, cartItemId)
 
       // Remove the item from the local shopping cart array
-      const index = shoppingCart.value.findIndex(item =>
-        'cart_item_id' in item
-          ? item.cart_item_id === cartItemId
-          : item._id === cartItemId
+      const index = shoppingCart.value.findIndex((item) =>
+        'cart_item_id' in item ? item.cart_item_id === cartItemId : item._id === cartItemId,
       )
 
       if (index !== -1) {
@@ -108,7 +105,6 @@ export const useAppStore = defineStore('appStore', () => {
     }
   }
 
-  
   async function init() {
     userId.value = getOrCreateUserId()
     console.log('User ID:', userId.value)
