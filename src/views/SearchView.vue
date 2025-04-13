@@ -5,6 +5,18 @@
     <div class="search-header">
       <div class="filter-section" v-if="filteredResults.length > 0">
         <span class="results-count">{{ filteredResults.length }} results found</span>
+
+        <!-- Add this sorting dropdown -->
+        <div class="sort-options">
+          <span class="sort-label">Sort by:</span>
+          <Dropdown
+            v-model="sortBy"
+            :options="sortOptions"
+            optionLabel="label"
+            placeholder="Sort by"
+            class="sort-dropdown"
+          />
+        </div>
       </div>
     </div>
 
@@ -27,7 +39,7 @@
       <div class="grid">
         <div
           class="col-12 sm:col-6 lg:col-3"
-          v-for="(discountItem, index) in filteredResults"
+          v-for="(discountItem, index) in sortedResults"
           :key="discountItem._id"
         >
           <div v-show="animateItems[index]" class="card product-card fade-in">
@@ -77,9 +89,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Button from 'primevue/button'
+import Dropdown from 'primevue/dropdown' // Add this import
 import { useAppStore } from '@/stores/appStore'
 import type { Discounts } from '@/types'
 
@@ -87,8 +100,40 @@ const route = useRoute()
 const store = useAppStore()
 const loading = ref(false)
 const filteredResults = ref<Discounts[]>([])
-// Add animation state array
 const animateItems = ref<boolean[]>([])
+
+// Add sorting options
+const sortOptions = [
+  { label: 'Relevance', value: 'relevance' },
+  { label: 'Lowest Price', value: 'price_asc' },
+  { label: 'Highest Price', value: 'price_desc' },
+  { label: 'Biggest Discount', value: 'discount' }
+]
+const sortBy = ref(sortOptions[0])
+
+// Sort the filtered results based on selected sort option
+const sortedResults = computed(() => {
+  if (!filteredResults.value.length) return []
+
+  const results = [...filteredResults.value]
+
+  switch (sortBy.value.value) {
+    case 'price_asc':
+      return results.sort((a, b) => a.discount_price - b.discount_price)
+    case 'price_desc':
+      return results.sort((a, b) => b.discount_price - a.discount_price)
+    case 'discount':
+      return results.sort((a, b) =>
+        (b.discount_percentage || 0) - (a.discount_percentage || 0))
+    default:
+      return results // Keep original order for relevance
+  }
+})
+
+// Watch for changes in the sort option to animate items
+watch(sortBy, () => {
+  setupAnimation(sortedResults.value.length)
+})
 
 // Calculate original price from discount price and percentage
 const getOriginalPrice = (discountItem: Discounts): string => {
@@ -398,6 +443,29 @@ h1 {
     align-items: flex-start;
     gap: 0.5rem;
   }
+}
+
+/* Add these styles */
+.filter-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sort-options {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.sort-dropdown {
+  width: 180px;
 }
 
 /* Add these animation styles */
