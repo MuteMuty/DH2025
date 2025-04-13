@@ -21,12 +21,12 @@
     </div>
 
     <div v-if="loading" class="loading-container">
-      <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4A90E2;"></i>
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: #4a90e2"></i>
       <p>Searching for deals...</p>
     </div>
 
     <div v-else-if="filteredResults.length === 0 && route.query.q" class="empty-results">
-      <i class="pi pi-info-circle" style="font-size: 2rem; color: #4A90E2;"></i>
+      <i class="pi pi-info-circle" style="font-size: 2rem; color: #4a90e2"></i>
       <h3>No results found</h3>
       <p>Try different keywords or filters</p>
     </div>
@@ -59,13 +59,24 @@
             </div>
 
             <div class="product-details">
-              <h3>{{ typeof discountItem.item_description === 'string' ?
-                discountItem.item_description : 'Product' }}</h3>
+              <h3>
+                {{
+                  typeof discountItem.item_description === 'string'
+                    ? discountItem.item_description
+                    : 'Product'
+                }}
+              </h3>
 
               <!-- Add validity period if available -->
-              <div class="validity-period" v-if="discountItem.offer_start_date && discountItem.offer_end_date">
+              <div
+                class="validity-period"
+                v-if="discountItem.offer_start_date && discountItem.offer_end_date"
+              >
                 <i class="pi pi-calendar"></i>
-                <span>{{ formatDate(discountItem.offer_start_date) }} - {{ formatDate(discountItem.offer_end_date) }}</span>
+                <span
+                  >{{ formatDate(discountItem.offer_start_date) }} -
+                  {{ formatDate(discountItem.offer_end_date) }}</span
+                >
               </div>
 
               <div class="price-container">
@@ -89,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown' // Add this import
@@ -107,7 +118,7 @@ const sortOptions = [
   { label: 'Relevance', value: 'relevance' },
   { label: 'Lowest Price', value: 'price_asc' },
   { label: 'Highest Price', value: 'price_desc' },
-  { label: 'Biggest Discount', value: 'discount' }
+  { label: 'Biggest Discount', value: 'discount' },
 ]
 const sortBy = ref(sortOptions[0])
 
@@ -123,8 +134,7 @@ const sortedResults = computed(() => {
     case 'price_desc':
       return results.sort((a, b) => b.discount_price - a.discount_price)
     case 'discount':
-      return results.sort((a, b) =>
-        (b.discount_percentage || 0) - (a.discount_percentage || 0))
+      return results.sort((a, b) => (b.discount_percentage || 0) - (a.discount_percentage || 0))
     default:
       return results // Keep original order for relevance
   }
@@ -137,7 +147,7 @@ watch(sortBy, () => {
 
 // Calculate original price from discount price and percentage
 const getOriginalPrice = (discountItem: Discounts): string => {
-  if (!discountItem.discount_percentage) return discountItem.discount_price.toFixed(2);
+  if (!discountItem.discount_percentage) return discountItem.discount_price.toFixed(2)
   return (discountItem.discount_price / (1 - discountItem.discount_percentage / 100)).toFixed(2)
 }
 
@@ -152,7 +162,8 @@ function isInCart(discountItem: Discounts) {
   return store.shoppingCart.some((item) =>
     'discount' in item && typeof item.discount === 'object' && item.discount !== null
       ? (item.discount as Discounts)._id === discountItem._id
-      : item._id === discountItem._id)
+      : item._id === discountItem._id,
+  )
 }
 
 // Add this function to handle animation when results change
@@ -162,11 +173,14 @@ const setupAnimation = (count: number) => {
 
   // Stagger the animations
   for (let i = 0; i < count; i++) {
-    setTimeout(() => {
-      if (i < animateItems.value.length) {
-        animateItems.value[i] = true
-      }
-    }, 100 + i * 100) // 100ms delay between each item
+    setTimeout(
+      () => {
+        if (i < animateItems.value.length) {
+          animateItems.value[i] = true
+        }
+      },
+      100 + i * 100,
+    ) // 100ms delay between each item
   }
 }
 
@@ -184,42 +198,43 @@ watch(
       const selectedStores = selectedStoresParam ? selectedStoresParam.split(',') : []
 
       // Only make the API call if we don't already have results or the search query changed
-      store.searchProducts({
-        name: queryString,
-        orderBy: 'discount_percentage',
-        sortOrder: 'desc'
-      })
-      .then(results => {
-        console.log('Got search results:', results)
+      store
+        .searchProducts({
+          name: queryString,
+          orderBy: 'discount_percentage',
+          sortOrder: 'desc',
+        })
+        .then((results) => {
+          console.log('Got search results:', results)
 
-        // Filter results by selected stores if any are selected
-        if (selectedStores.length > 0) {
-          console.log('Filtering by stores:', selectedStores)
-          filteredResults.value = store.searchResults.filter(item =>
-            selectedStores.includes(item.store)
-          )
-        } else {
-          // If no stores selected, show all results
-          filteredResults.value = store.searchResults
-        }
+          // Filter results by selected stores if any are selected
+          if (selectedStores.length > 0) {
+            console.log('Filtering by stores:', selectedStores)
+            filteredResults.value = store.searchResults.filter((item) =>
+              selectedStores.includes(item.store),
+            )
+          } else {
+            // If no stores selected, show all results
+            filteredResults.value = store.searchResults
+          }
 
-        // Setup animation for the new results
-        setupAnimation(filteredResults.value.length)
-      })
-      .catch(error => {
-        console.error('Search error:', error)
-        filteredResults.value = []
-      })
-      .finally(() => {
-        loading.value = false
-      })
+          // Setup animation for the new results
+          setupAnimation(filteredResults.value.length)
+        })
+        .catch((error) => {
+          console.error('Search error:', error)
+          filteredResults.value = []
+        })
+        .finally(() => {
+          loading.value = false
+        })
     } else {
       // Clear results if there's no query
       store.searchResults = []
       filteredResults.value = []
     }
   },
-  { immediate: true, deep: true } // Make sure we track deep changes to query objects
+  { immediate: true, deep: true }, // Make sure we track deep changes to query objects
 )
 </script>
 
@@ -232,7 +247,7 @@ watch(
 
 h1 {
   margin-bottom: 1.5rem;
-  color: #2C2C2C;
+  color: #2c2c2c;
   font-weight: 600;
 }
 
@@ -257,7 +272,7 @@ h1 {
   align-items: center;
   justify-content: center;
   padding: 3rem 0;
-  color: #4A90E2;
+  color: #4a90e2;
 }
 
 .loading-container p {
@@ -276,7 +291,7 @@ h1 {
 
 .empty-results h3 {
   margin-top: 1rem;
-  color: #2C2C2C;
+  color: #2c2c2c;
 }
 
 .empty-results p {
@@ -295,7 +310,7 @@ h1 {
   margin: -0.5rem;
 }
 
-.grid [class*="col-"] {
+.grid [class*='col-'] {
   padding: 0.5rem;
 }
 
@@ -328,6 +343,11 @@ h1 {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.1);
   overflow: visible;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  justify-content: flex-end;
 }
 
 .product-card:hover {

@@ -32,7 +32,7 @@
     <div class="grid">
       <div
         class="col-12 sm:col-6 lg:col-3"
-        v-for="(discountItem) in sortedDiscounts"
+        v-for="discountItem in sortedDiscounts"
         :key="discountItem._id"
       >
         <div class="card product-card fade-in">
@@ -51,7 +51,10 @@
             <h3>{{ discountItem.item_description }}</h3>
             <div class="validity-period">
               <i class="pi pi-calendar"></i>
-              <span>{{ formatDate(discountItem.offer_start_date) }} - {{ formatDate(discountItem.offer_end_date) }}</span>
+              <span
+                >{{ formatDate(discountItem.offer_start_date) }} -
+                {{ formatDate(discountItem.offer_end_date) }}</span
+              >
             </div>
             <div class="price-container">
               <span class="original-price">{{ getOgPrice(discountItem) }}€</span>
@@ -195,6 +198,11 @@ onMounted(() => {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.1);
   overflow: visible;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  justify-content: flex-end;
 }
 
 .product-card:hover {

@@ -29,7 +29,9 @@
                     :value="option.value"
                     :inputId="option.value"
                   />
-                  <label :for="option.value" class="ml-2">{{ option.name }}</label>
+                  <label style="padding-left: 0.5rem" :for="option.value" class="ml-2">{{
+                    option.name
+                  }}</label>
                 </div>
               </div>
               <div class="store-actions">
@@ -105,6 +107,7 @@ const storeOptions = [
   { name: 'Hofer', value: 'Hofer' },
   { name: 'Spar', value: 'Spar' },
   { name: 'Mercator', value: 'Mercator' },
+  { name: 'Eurospin', value: 'Eurospin' },
 ]
 
 // Computed property for the badge count
@@ -151,15 +154,15 @@ const handleSearchInput = (event: any) => {
       if (route.name !== 'search') {
         router.push({
           path: '/search',
-          query: queryObject
+          query: queryObject,
         })
       } else {
         // If already on search page, just update the query parameter
         // Make sure we preserve any existing query parameters that aren't being updated
         router.replace({
           query: {
-            ...queryObject
-          }
+            ...queryObject,
+          },
         })
       }
 
@@ -167,7 +170,7 @@ const handleSearchInput = (event: any) => {
       store.searchProducts({
         name: query,
         orderBy: 'discount_percentage',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
       })
     }, 300)
   }
@@ -214,7 +217,7 @@ watch(selectedStores, (newStores) => {
   // Only update if we're already on the search page and have a search query
   if (route.name === 'search' && searchQuery.value.length >= 2) {
     const queryObject: Record<string, string> = {
-      q: searchQuery.value
+      q: searchQuery.value,
     }
 
     if (newStores.length > 0) {
@@ -223,7 +226,7 @@ watch(selectedStores, (newStores) => {
 
     // Update the URL without navigating
     router.replace({
-      query: queryObject
+      query: queryObject,
     })
   }
 })

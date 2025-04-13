@@ -87,7 +87,10 @@
               <h3>{{ discountItem.item_description }}</h3>
               <div class="validity-period">
                 <i class="pi pi-calendar"></i>
-                <span>{{ formatDate(discountItem.offer_start_date) }} - {{ formatDate(discountItem.offer_end_date) }}</span>
+                <span
+                  >{{ formatDate(discountItem.offer_start_date) }} -
+                  {{ formatDate(discountItem.offer_end_date) }}</span
+                >
               </div>
               <div class="price-container">
                 <span class="original-price">{{ getOgPrice(discountItem) }}€</span>
@@ -123,9 +126,9 @@ function formatDate(dateString: string): string {
 
 function isInCart(discountItem: Discounts) {
   console.log('store.shoppingCart', store.shoppingCart)
+  // @ts-ignore
   return store.shoppingCart.some((item) => item.discount._id === discountItem._id)
 }
-
 
 const store = useAppStore()
 
@@ -142,16 +145,32 @@ const animateBiggestDiscounts = ref([false, false, false, false])
 // Start animation sequence when component is mounted
 onMounted(() => {
   // Animate trending deals
-  setTimeout(() => { animateDeals.value[0] = true }, 200)
-  setTimeout(() => { animateDeals.value[1] = true }, 400)
-  setTimeout(() => { animateDeals.value[2] = true }, 600)
-  setTimeout(() => { animateDeals.value[3] = true }, 800)
+  setTimeout(() => {
+    animateDeals.value[0] = true
+  }, 200)
+  setTimeout(() => {
+    animateDeals.value[1] = true
+  }, 400)
+  setTimeout(() => {
+    animateDeals.value[2] = true
+  }, 600)
+  setTimeout(() => {
+    animateDeals.value[3] = true
+  }, 800)
 
   // Animate biggest discounts with a slight delay
-  setTimeout(() => { animateBiggestDiscounts.value[0] = true }, 1000)
-  setTimeout(() => { animateBiggestDiscounts.value[1] = true }, 1200)
-  setTimeout(() => { animateBiggestDiscounts.value[2] = true }, 1400)
-  setTimeout(() => { animateBiggestDiscounts.value[3] = true }, 1600)
+  setTimeout(() => {
+    animateBiggestDiscounts.value[0] = true
+  }, 1000)
+  setTimeout(() => {
+    animateBiggestDiscounts.value[1] = true
+  }, 1200)
+  setTimeout(() => {
+    animateBiggestDiscounts.value[2] = true
+  }, 1400)
+  setTimeout(() => {
+    animateBiggestDiscounts.value[3] = true
+  }, 1600)
 })
 </script>
 
@@ -251,6 +270,10 @@ onMounted(() => {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.1);
   overflow: visible;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .product-card:hover {
