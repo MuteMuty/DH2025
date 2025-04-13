@@ -3,7 +3,7 @@
     <section class="hero-section">
       <div class="hero-content">
         <h1>The Saving Grace</h1>
-        <p class="subtitle">Because buying full price is a sin</p>
+        <p class="subtitle">Because buying at full price is a sin!</p>
       </div>
     </section>
 
