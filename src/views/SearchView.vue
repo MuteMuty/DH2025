@@ -168,7 +168,7 @@
               icon="pi pi-shopping-cart"
               :label="isInCart(discountItem) ? 'Already in Wishlist' : 'Add to Wishlist'"
               :disabled="isInCart(discountItem)"
-              @click="store.addToCart(discountItem)"
+              @click="addToWishlist(discountItem)"
             />
           </div>
         </div>
@@ -554,6 +554,18 @@ const clearBundleView = () => {
 
   // Animate the transition when switching views
   setupAnimation(filteredResults.value.length)
+}
+
+// Add this function to handle immediate wishlist updates
+const addToWishlist = (discountItem: Discounts) => {
+  // First, add the item to the local wishlist array for immediate UI update
+  if (!isInCart(discountItem)) {
+    // Add item to the store's shopping cart array directly for immediate feedback
+    store.shoppingCart.push(discountItem)
+
+    // Then make the API call to persist the change
+    store.addToCart(discountItem)
+  }
 }
 </script>
 
