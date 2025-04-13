@@ -19,7 +19,11 @@
           v-for="(discountItem, index) in store.trendingDiscounts"
           :key="discountItem._id"
         >
-          <div v-show="animateDeals[index]" class="card product-card fade-in">
+          <div
+            v-show="animateDeals[index]"
+            class="card product-card fade-in"
+            @dblclick="showProductDetail(discountItem)"
+          >
             <div v-if="discountItem.discount_percentage > 0" class="discount-tag">
               -{{ discountItem.discount_percentage }}%
             </div>
@@ -73,7 +77,11 @@
           v-for="(discountItem, index) in store.biggestDiscounts"
           :key="discountItem._id"
         >
-          <div v-show="animateBiggestDiscounts[index]" class="card product-card fade-in">
+          <div
+            v-show="animateBiggestDiscounts[index]"
+            class="card product-card fade-in"
+            @dblclick="showProductDetail(discountItem)"
+          >
             <div class="discount-tag">-{{ discountItem.discount_percentage }}%</div>
             <div class="store-tag">
               <img
@@ -108,12 +116,18 @@
       </div>
     </section>
   </div>
+
+  <ProductDetailPopup
+    v-model:visible="showPopup"
+    :product="selectedProduct"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAppStore } from '@/stores/appStore'
 import { type Discounts } from '@/types'
+import ProductDetailPopup from '@/components/ProductDetailPopup.vue'
 
 function getOgPrice(discountItem: Discounts) {
   return (discountItem.discount_price / (1 - discountItem.discount_percentage / 100)).toFixed(2)
@@ -172,6 +186,16 @@ onMounted(() => {
     animateBiggestDiscounts.value[3] = true
   }, 1600)
 })
+
+// Add new variables for popup
+const showPopup = ref(false)
+const selectedProduct = ref<Discounts | null>(null)
+
+// Function to show product detail popup
+function showProductDetail(product: Discounts) {
+  selectedProduct.value = product
+  showPopup.value = true
+}
 </script>
 
 <style scoped>
@@ -274,6 +298,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  cursor: pointer;
 }
 
 .product-card:hover {

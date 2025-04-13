@@ -35,7 +35,10 @@
         v-for="discountItem in sortedDiscounts"
         :key="discountItem._id"
       >
-        <div class="card product-card fade-in">
+        <div
+          class="card product-card fade-in"
+          @dblclick="showProductDetail(discountItem)"
+        >
           <div v-if="discountItem.discount_percentage > 0" class="discount-tag">
             -{{ discountItem.discount_percentage }}%
           </div>
@@ -70,6 +73,10 @@
         </div>
       </div>
     </div>
+    <ProductDetailPopup
+      v-model:visible="showPopup"
+      :product="selectedProduct"
+    />
   </div>
 </template>
 
@@ -77,6 +84,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAppStore } from '@/stores/appStore'
 import { type Discounts } from '@/types'
+import ProductDetailPopup from '@/components/ProductDetailPopup.vue'
 
 const store = useAppStore()
 const sortBy = ref('trending')
@@ -114,6 +122,14 @@ onMounted(() => {
   store.loadTrendingItems()
   store.getShoppingCart()
 })
+
+const showPopup = ref(false)
+const selectedProduct = ref<Discounts | null>(null)
+
+function showProductDetail(product: Discounts) {
+  selectedProduct.value = product
+  showPopup.value = true
+}
 </script>
 
 <style scoped>
@@ -203,6 +219,7 @@ onMounted(() => {
   flex-direction: column;
   justify-content: space-between;
   justify-content: flex-end;
+  cursor: pointer;
 }
 
 .product-card:hover {
