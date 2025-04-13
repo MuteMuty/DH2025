@@ -5,6 +5,7 @@
         <img src="/Benis4.png" alt="The Saving Grace" class="nav-logo" />
         <div class="navigation-links">
           <router-link to="/" class="nav-link">Home</router-link>
+          <router-link to="/trending" class="nav-link">New Deals!</router-link>
         </div>
         <div class="menubar-content">
           <!-- Search without icon -->
