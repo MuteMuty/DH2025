@@ -9,6 +9,19 @@
     <div class="product-detail-popup" v-if="product">
       <div class="popup-content">
         <div class="product-image-container">
+          <!-- Product image for specific products -->
+          <img
+            v-if="product.item_description === 'SARAJEVSKI ČEVAPČIČI'"
+            src="/product1.png"
+            alt="Product Image"
+            class="product-image"
+          />
+          <img
+            v-if="product.item_description === 'Merlot'"
+            src="/product2.png"
+            alt="Product Image"
+            class="product-image"
+          />
           <!-- Store logo watermark -->
           <img
             :src="`/stores-imgs/${product.store.toLowerCase()}-img.png`"
@@ -157,6 +170,15 @@ const isInCart = (product: Discounts): boolean => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .store-watermark {

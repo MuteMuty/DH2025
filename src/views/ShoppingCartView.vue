@@ -10,7 +10,7 @@
     <div v-else-if="!cartItems.length" class="empty-cart">
       <i class="pi pi-shopping-cart" style="font-size: 3rem; color: #ccc"></i>
       <h3>Your wishlist is empty</h3>
-      <p>Discover amazing deals and add them to your cart!</p>
+      <p>Discover amazing deals and add them to your wishlist!</p>
       <Button label="Browse Deals" @click="$router.push('/trending')" />
     </div>
 
