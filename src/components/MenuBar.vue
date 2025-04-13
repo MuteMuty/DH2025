@@ -14,10 +14,19 @@
               <InputText
                 v-model="searchQuery"
                 placeholder="Search for products..."
-                @keyup.enter="() => {}"
+                @keyup.enter="handleEnterKeyPress"
                 @input="handleSearchInput"
               />
+              <i class="pi pi-search"></i>
             </span>
+            <!-- Add search terms display -->
+            <div class="search-terms" v-if="searchTerms.length > 0">
+              <span v-for="(term, index) in searchTerms" :key="index" class="search-term-chip">
+                {{ term }}
+                <i class="pi pi-times"
+                  @click="removeSearchTerm(index)"></i>
+              </span>
+            </div>
           </div>
 
           <!-- Store selector as a dropdown with checkboxes -->
@@ -98,6 +107,7 @@ const toast = useToast()
 
 const router = useRouter()
 const route = useRoute()
+const searchTerms = ref<string[]>([]) // Track multiple search terms
 const searchQuery = ref('')
 const selectedStores = ref<string[]>([])
 const storeOverlay = ref<any>(null)
@@ -124,7 +134,7 @@ const selectAllStores = () => {
 
 // Handle both search input and empty search
 const handleSearchInput = (event: any) => {
-  const query = event.target.value.trim()
+  const query = searchQuery.value.trim()
 
   // Clear previous timeout
   if (debounceTimeout.value) {
@@ -139,41 +149,81 @@ const handleSearchInput = (event: any) => {
     return
   }
 
-  // Only navigate if we're typing something meaningful
+  // Only proceed if we're typing something meaningful
   if (query.length >= 2) {
-    // Set new timeout for debounce (300ms)
     debounceTimeout.value = setTimeout(() => {
-      // Build query object
-      const queryObject: Record<string, string> = { q: query }
+      // Regular search behavior for typing
+      if (route.name !== 'search') {
+        router.push({
+          path: '/search',
+          query: {
+            q: searchTerms.value.length > 0 ? [...searchTerms.value, query].join(',') : query,
+            stores: selectedStores.value.length > 0 ? selectedStores.value.join(',') : undefined
+          }
+        })
+      } else {
+        // If already on search page, just update the query
+        router.replace({
+          query: {
+            q: searchTerms.value.length > 0 ? [...searchTerms.value, query].join(',') : query,
+            stores: selectedStores.value.length > 0 ? selectedStores.value.join(',') : undefined
+          }
+        })
+      }
+    }, 300)
+  }
+}
 
-      // Only add stores filter if at least one store is selected
+// Add a new function to handle Enter key presses
+const handleEnterKeyPress = () => {
+  const query = searchQuery.value.trim()
+  if (query.length >= 2) {
+    // Add to search terms if not already included
+    if (!searchTerms.value.includes(query)) {
+      searchTerms.value.push(query)
+
+      // Navigate to search with updated terms
+      router.replace({
+        path: '/search',
+        query: {
+          q: searchTerms.value.join(','),
+          stores: selectedStores.value.length > 0 ? selectedStores.value.join(',') : undefined
+        }
+      })
+
+      // Clear input field for next term
+      searchQuery.value = ''
+    }
+  }
+}
+
+// Create a function to handle removing search terms
+const removeSearchTerm = (index: number) => {
+  // Remove the term from our array
+  searchTerms.value.splice(index, 1)
+
+  // If we've removed all terms and we're on the search page, go back to home
+  if (searchTerms.value.length === 0 && route.name === 'search') {
+    router.push('/')
+    return
+  }
+
+  // Otherwise update the search with the remaining terms
+  if (route.name === 'search') {
+    const queryObject: Record<string, string> = {}
+
+    if (searchTerms.value.length > 0) {
+      queryObject.q = searchTerms.value.join(',')
+
       if (selectedStores.value.length > 0) {
         queryObject.stores = selectedStores.value.join(',')
       }
 
-      // Only navigate if we're not already on the search page
-      if (route.name !== 'search') {
-        router.push({
-          path: '/search',
-          query: queryObject,
-        })
-      } else {
-        // If already on search page, just update the query parameter
-        // Make sure we preserve any existing query parameters that aren't being updated
-        router.replace({
-          query: {
-            ...queryObject,
-          },
-        })
-      }
-
-      // Always call searchProducts with the current query and apply filters in the view
-      store.searchProducts({
-        name: query,
-        orderBy: 'discount_percentage',
-        sortOrder: 'desc',
+      // Update the URL with the new search terms
+      router.replace({
+        query: queryObject
       })
-    }, 300)
+    }
   }
 }
 
@@ -511,5 +561,32 @@ watch(selectedStores, (newStores) => {
 
 .logo-link:hover .nav-logo {
   transform: scale(1.05);
+}
+
+.search-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.search-term-chip {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  padding: 0.25rem 0.5rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.search-term-chip i {
+  cursor: pointer;
+  font-size: 0.7rem;
+}
+
+.search-term-chip i:hover {
+  color: #ff5252;
 }
 </style>

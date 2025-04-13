@@ -2,9 +2,17 @@
   <div class="search-container">
     <h1>Search Results</h1>
 
+    <!-- Add active search terms display -->
+    <div class="active-search-terms" v-if="searchTerms.length > 0">
+      <span>Searching for: </span>
+      <span v-for="(term, index) in searchTerms" :key="index" class="search-term-badge">
+        {{ term }}
+      </span>
+    </div>
+
     <div class="search-header">
       <div class="filter-section" v-if="filteredResults.length > 0">
-        <span class="results-count">{{ filteredResults.length }} results found</span>
+        <span class="results-count">{{ filteredResults.length }} results found for {{ searchTerms.length }} search terms</span>
 
         <!-- Add this sorting dropdown -->
         <div class="sort-options">
@@ -116,6 +124,8 @@ import ProductDetailPopup from '@/components/ProductDetailPopup.vue'
 const route = useRoute()
 const store = useAppStore()
 const loading = ref(false)
+const searchTerms = ref<string[]>([])
+const activeSearches = ref<string[]>([])
 const filteredResults = ref<Discounts[]>([])
 const animateItems = ref<boolean[]>([])
 
@@ -203,54 +213,64 @@ function showProductDetail(product: Discounts) {
 // Watch for URL query changes to trigger search
 watch(
   () => route.query,
-  (newQuery) => {
+  async (newQuery) => {
     const queryString = newQuery.q as string
+
     if (queryString) {
       loading.value = true
-      console.log('Searching for:', queryString)
+
+      // Split the query string into individual search terms
+      searchTerms.value = queryString.split(',').filter(term => term.trim().length >= 2)
+      activeSearches.value = [...searchTerms.value]
 
       // Get selected stores if any
       const selectedStoresParam = newQuery.stores as string
       const selectedStores = selectedStoresParam ? selectedStoresParam.split(',') : []
 
-      // Only make the API call if we don't already have results or the search query changed
-      store
-        .searchProducts({
-          name: queryString,
-          orderBy: 'discount_percentage',
-          sortOrder: 'desc',
-        })
-        .then((results) => {
-          console.log('Got search results:', results)
+      // Search for all terms and combine results
+      const allResults: Discounts[] = []
 
-          // Filter results by selected stores if any are selected
-          if (selectedStores.length > 0) {
-            console.log('Filtering by stores:', selectedStores)
-            filteredResults.value = store.searchResults.filter((item) =>
-              selectedStores.includes(item.store),
-            )
-          } else {
-            // If no stores selected, show all results
-            filteredResults.value = store.searchResults
+      // Search for each term separately
+      for (const term of searchTerms.value) {
+        try {
+          await store.searchProducts({
+            name: term.trim(),
+            orderBy: 'discount_percentage',
+            sortOrder: 'desc',
+          })
+
+          // Add results to our combined results array, avoiding duplicates
+          for (const result of store.searchResults) {
+            if (!allResults.some(item => item._id === result._id)) {
+              allResults.push(result)
+            }
           }
+        } catch (error) {
+          console.error(`Error searching for term "${term}":`, error)
+        }
+      }
 
-          // Setup animation for the new results
-          setupAnimation(filteredResults.value.length)
-        })
-        .catch((error) => {
-          console.error('Search error:', error)
-          filteredResults.value = []
-        })
-        .finally(() => {
-          loading.value = false
-        })
+      // Filter by selected stores if needed
+      if (selectedStores.length > 0) {
+        filteredResults.value = allResults.filter((item) =>
+          selectedStores.includes(item.store),
+        )
+      } else {
+        filteredResults.value = allResults
+      }
+
+      // Setup animation for the combined results
+      setupAnimation(filteredResults.value.length)
+      loading.value = false
     } else {
       // Clear results if there's no query
+      searchTerms.value = []
       store.searchResults = []
       filteredResults.value = []
+      loading.value = false
     }
   },
-  { immediate: true, deep: true }, // Make sure we track deep changes to query objects
+  { immediate: true, deep: true }
 )
 </script>
 
@@ -519,5 +539,26 @@ h1 {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Add these styles */
+.active-search-terms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(74, 144, 226, 0.1);
+  border-radius: 8px;
+}
+
+.search-term-badge {
+  background: #4a90e2;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 </style>
