@@ -62,7 +62,7 @@
 
       <!-- Show this when a bundle view is active -->
       <div v-if="bundleView !== 'all'" class="bundle-active-bar">
-        <Button icon="pi pi-times" label="Clear bundle view" text @click="bundleView = 'all'" />
+        <Button icon="pi pi-times" label="Clear bundle view" text @click="clearBundleView" />
       </div>
     </div>
 
@@ -151,11 +151,17 @@
                 >
               </div>
 
+              <!-- Add this inside the price-container div in your template -->
               <div class="price-container">
-                <span class="original-price" v-if="discountItem.discount_percentage">
-                  {{ getOriginalPrice(discountItem) }}€
+                <div class="discount-price-wrapper">
+                  <span class="original-price" v-if="discountItem.discount_percentage">
+                    {{ getOriginalPrice(discountItem) }}€
+                  </span>
+                  <span class="discount-price">{{ discountItem.discount_price.toFixed(2) }}€</span>
+                </div>
+                <span class="unit-price" v-if="getUnitPrice(discountItem)">
+                  {{ getUnitPrice(discountItem) }}
                 </span>
-                <span class="discount-price">{{ discountItem.discount_price.toFixed(2) }}€</span>
               </div>
             </div>
             <Button
@@ -501,6 +507,54 @@ watch(
   },
   { immediate: true, deep: true }
 )
+
+// Add this function to your script section
+const getUnitPrice = (discountItem: Discounts): string | null => {
+  if (!discountItem.quantity) return null;
+
+  const quantity = discountItem.quantity.toLowerCase();
+  let match;
+
+  // Extract numeric value and unit from quantity string
+  // Look for common patterns like "500g", "1kg", "1.5L", "750ml", etc.
+  if (match = quantity.match(/(\d+(?:\.\d+)?)\s*([kgml]+)/i)) {
+    const [_, value, unit] = match;
+    let numericValue = parseFloat(value);
+    let normalized = '';
+
+    // Normalize to kg or L for consistent comparison
+    if (unit.toLowerCase() === 'g') {
+      numericValue = numericValue / 1000; // Convert g to kg
+      normalized = 'kg';
+    } else if (unit.toLowerCase() === 'kg') {
+      normalized = 'kg';
+    } else if (unit.toLowerCase() === 'ml') {
+      numericValue = numericValue / 1000; // Convert ml to L
+      normalized = 'L';
+    } else if (unit.toLowerCase() === 'l') {
+      normalized = 'L';
+    } else {
+      return null; // Unrecognized unit
+    }
+
+    // Calculate price per unit
+    const unitPrice = discountItem.discount_price / numericValue;
+
+    // Format with appropriate unit
+    return `${unitPrice.toFixed(2)}€/${normalized}`;
+  }
+
+  return null;
+}
+
+// Add this function to clear the bundle view
+const clearBundleView = () => {
+  // Set bundle view back to showing all results
+  bundleView.value = 'all'
+
+  // Animate the transition when switching views
+  setupAnimation(filteredResults.value.length)
+}
 </script>
 
 <style scoped>
@@ -694,16 +748,24 @@ h1 {
   color: #4caf50;
 }
 
+/* Update the price container to accommodate unit price */
 .price-container {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
   margin-top: 1rem;
   margin-bottom: 1.5rem;
   padding: 0.5rem 1rem;
   background: rgba(76, 175, 80, 0.05);
   border-radius: 12px;
+}
+
+/* Keep the original price and discount price on same line */
+.price-container .discount-price-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .original-price {
@@ -721,6 +783,19 @@ h1 {
   border-radius: 8px;
   background: white;
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+/* Add this to your style section */
+.unit-price {
+  font-size: 0.9rem;
+  color: #666;
+  display: block;
+  text-align: right;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  background: rgba(76, 175, 80, 0.06);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
 }
 
 @media (max-width: 768px) {
