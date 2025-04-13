@@ -6,7 +6,7 @@
       <div class="section-header">
         <h2>Trending Deals</h2>
         <Button
-          label="See All Deals"
+          label="Search new deals"
           icon="pi pi-arrow-right"
           text
           @click="$router.push('/trending')"
@@ -60,10 +60,10 @@
       <div class="section-header">
         <h2>Biggest Discounts</h2>
         <Button
-          label="See All"
+          label="Search new deals"
           icon="pi pi-arrow-right"
           text
-          @click="$router.push('/biggest-discounts')"
+          @click="$router.push('/trending')"
         />
       </div>
 
@@ -109,7 +109,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/appStore'
 import { type Discounts } from '@/types'
 
@@ -124,11 +123,10 @@ function formatDate(dateString: string): string {
 
 function isInCart(discountItem: Discounts) {
   console.log('store.shoppingCart', store.shoppingCart)
-  // @ts-ignore
   return store.shoppingCart.some((item) => item.discount._id === discountItem._id)
 }
 
-const router = useRouter()
+
 const store = useAppStore()
 
 onMounted(async () => {

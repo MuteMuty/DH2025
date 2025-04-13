@@ -32,7 +32,7 @@
     <div class="grid">
       <div
         class="col-12 sm:col-6 lg:col-3"
-        v-for="(discountItem, index) in sortedDiscounts"
+        v-for="(discountItem) in sortedDiscounts"
         :key="discountItem._id"
       >
         <div class="card product-card fade-in">

@@ -73,7 +73,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAppStore } from '@/stores/appStore'
-import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 
 interface CartItem {
@@ -98,7 +97,6 @@ interface CartItem {
   }
 }
 
-const router = useRouter()
 const store = useAppStore()
 const loading = ref(true)
 const cartItems = ref<CartItem[]>([])
