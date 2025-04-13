@@ -82,6 +82,18 @@ export const addToCartApi = async (userId: string, discountId: Discounts['_id'])
   console.log('DiscountID:', discountId)
 }
 
+export const removeFromCartApi = async (userId: string, cartItemId: string): Promise<void> => {
+  try {
+    console.log('Removing item from cart:', cartItemId)
+    console.log('UserID:', userId)
+    await axios.delete(`${API_BASE_URL}/shopping-cart/${userId}/${cartItemId}`)
+    console.log('Item removed from cart:', cartItemId)
+  } catch (error) {
+    console.error('Error removing item from cart:', error)
+    throw error
+  }
+}
+
 export const notificationsSignUpApi = async (
   userId: string,
   firebaseToken: string,

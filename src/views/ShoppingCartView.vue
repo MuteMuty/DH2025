@@ -47,7 +47,7 @@
               icon="pi pi-trash"
               label="Remove from Cart"
               severity="danger"
-              @click="removeItem(cartItem)"
+               @click="removeItemFromCart(cartItem)"
             />
           </div>
         </div>
@@ -163,11 +163,28 @@ const getTotalSavings = (): string => {
 }
 
 // Remove item from cart
-const removeItem = (item: CartItem) => {
-  // Here you would typically call a remove API endpoint
-  const index = cartItems.value.findIndex(cartItem => cartItem.cart_item_id === item.cart_item_id)
-  if (index !== -1) {
-    cartItems.value.splice(index, 1)
+const removeItemFromCart = async (item: CartItem) => {
+  // Show loading state if desired
+  loading.value = true
+
+  try {
+    // Call the API through the store
+    const success = await store.removeFromCart(item.discount._id)
+
+    if (success) {
+      // Remove from local array only if API call succeeds
+      const index = cartItems.value.findIndex(cartItem => cartItem.cart_item_id === item.cart_item_id)
+      if (index !== -1) {
+        cartItems.value.splice(index, 1)
+      }
+
+
+    }
+  } catch (error) {
+    console.error('Failed to remove item from cart:', error)
+    // Optional: show error message
+  } finally {
+    loading.value = false
   }
 }
 </script>

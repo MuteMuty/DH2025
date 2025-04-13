@@ -5,6 +5,7 @@ import {
   searchProductsApi,
   getCartItemsApi,
   addToCartApi,
+  removeFromCartApi, // Add this import
   notificationsSignUpApi,
   getTrendingItemsApi,
 } from '@/api'
@@ -32,6 +33,32 @@ export const useAppStore = defineStore('appStore', () => {
       shoppingCart.value.push(discountItem)
     } catch (error) {
       console.error('Error adding to cart:', error)
+    }
+  }
+
+  async function removeFromCart(cartItemId: string) {
+    try {
+
+      if (!userId.value) {
+        userId.value = getOrCreateUserId()
+      }
+      await removeFromCartApi(userId.value, cartItemId)
+
+      // Remove the item from the local shopping cart array
+      const index = shoppingCart.value.findIndex(item =>
+        'cart_item_id' in item
+          ? item.cart_item_id === cartItemId
+          : item._id === cartItemId
+      )
+
+      if (index !== -1) {
+        shoppingCart.value.splice(index, 1)
+      }
+
+      return true
+    } catch (error) {
+      console.error('Error removing from cart:', error)
+      return false
     }
   }
 
@@ -109,6 +136,7 @@ export const useAppStore = defineStore('appStore', () => {
     searchResults,
     shoppingCart,
     addToCart,
+    removeFromCart, // Add this
     getShoppingCart,
     searchProducts,
     loadTrendingItems,
