@@ -32,9 +32,7 @@
     </div>
 
     <div v-else-if="filteredResults.length > 0" class="search-results">
-      <div class="filter-section">
-        <span class="results-count">{{ filteredResults.length }} results found</span>
-      </div>
+      <div class="filter-section"></div>
 
       <div class="grid">
         <div
@@ -102,10 +100,7 @@
     </div>
 
     <!-- Add the ProductDetailPopup component -->
-    <ProductDetailPopup
-      v-model:visible="showPopup"
-      :product="selectedProduct"
-    />
+    <ProductDetailPopup v-model:visible="showPopup" :product="selectedProduct" />
   </div>
 </template>
 
