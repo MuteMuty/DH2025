@@ -7,27 +7,6 @@
       </div>
     </section>
 
-    <section class="nav-cards-section">
-      <div class="grid">
-        <div class="col-12 md:col-4" v-for="(item, index) in navItems" :key="item.label">
-          <!-- Add animation with staggered delay -->
-          <div
-            v-show="animateNav[index]"
-            class="card nav-card fade-in"
-            @click="$router.push(item.route)"
-          >
-            <div class="card-header">
-              <i :class="item.icon" />
-            </div>
-            <div class="card-body">
-              <h3>{{ item.label }}</h3>
-              <p>{{ item.description }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="trending-section">
       <div class="section-header">
         <h2>Trending Deals</h2>
@@ -67,7 +46,6 @@
         </div>
       </div>
     </section>
-
   </div>
 </template>
 
@@ -100,7 +78,6 @@ const animateStores = ref([false, false, false, false])
 
 // Mock data for stores
 const stores = ref<Store[]>([Store.Lidl, Store.Hofer, Store.Spar, Store.Mercator, Store.Eurospin])
-
 
 // Start animation sequence when component is mounted
 onMounted(() => {
@@ -171,7 +148,6 @@ onMounted(() => {
   color: #6c757d;
   margin-bottom: 2rem;
 }
-
 
 .search-box .p-inputtext {
   flex-grow: 1;
