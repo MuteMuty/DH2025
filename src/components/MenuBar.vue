@@ -5,7 +5,6 @@
         <img src="/Benis4.png" alt="The Saving Grace" class="nav-logo" />
         <div class="navigation-links">
           <router-link to="/" class="nav-link">Home</router-link>
-
         </div>
         <div class="menubar-content">
           <!-- Search without icon -->
@@ -17,7 +16,6 @@
                 @keyup.enter="() => {}"
                 @input="handleSearchInput"
               />
-
             </span>
           </div>
 
@@ -173,7 +171,7 @@ const toggleNotification = () => {
   toast.add({
     severity: 'info',
     summary: 'Notifications',
-    detail: 'Enabled notifications for discount',
+    detail: 'Enabled notifications for discounts',
     life: 3000,
   })
 
@@ -320,7 +318,6 @@ onMounted(async () => {
 
 .store-button {
   height: 2.5rem;
-  width: 5rem;
 }
 
 .store-button:hover {
@@ -350,7 +347,6 @@ onMounted(async () => {
 
 .cart-link:hover {
   color: #4caf50;
-
 }
 
 .cart-link :deep(.p-button) {
