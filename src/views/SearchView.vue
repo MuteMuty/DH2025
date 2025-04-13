@@ -3,8 +3,8 @@
     <h1>Search Results</h1>
 
     <div class="search-header">
-      <div class="filter-section" v-if="store.searchResults.length > 0">
-        <span class="results-count">{{ store.searchResults.length }} results found</span>
+      <div class="filter-section" v-if="filteredResults.length > 0">
+        <span class="results-count">{{ filteredResults.length }} results found</span>
       </div>
     </div>
 
@@ -13,29 +13,49 @@
       <p>Searching for deals...</p>
     </div>
 
-    <div v-else-if="store.searchResults.length === 0 && route.query.q" class="empty-results">
+    <div v-else-if="filteredResults.length === 0 && route.query.q" class="empty-results">
       <i class="pi pi-info-circle" style="font-size: 2rem; color: #4A90E2;"></i>
       <h3>No results found</h3>
       <p>Try different keywords or filters</p>
     </div>
 
-    <div v-else-if="store.searchResults.length > 0" class="search-results">
+    <div v-else-if="filteredResults.length > 0" class="search-results">
+      <div class="filter-section">
+        <span class="results-count">{{ filteredResults.length }} results found</span>
+      </div>
+
       <div class="grid">
         <div
           class="col-12 sm:col-6 lg:col-3"
-          v-for="discountItem in store.searchResults"
+          v-for="discountItem in filteredResults"
           :key="discountItem._id"
         >
           <div class="card product-card">
+            <!-- Circular discount tag like in HomeView -->
             <div class="discount-tag" v-if="discountItem.discount_percentage">
               -{{ discountItem.discount_percentage }}%
             </div>
-            <div class="store-tag" :class="`store-${discountItem.store.toLowerCase()}`">
-              {{ discountItem.store }}
+
+            <!-- Store tag with image and name -->
+            <div class="store-tag">
+              <img
+                :src="`/stores-imgs/${discountItem.store.toLowerCase()}-img.png`"
+                :alt="discountItem.store"
+                class="store-logo"
+              />
+              <span class="store-name">{{ discountItem.store }}</span>
             </div>
+
             <div class="product-details">
               <h3>{{ typeof discountItem.item_description === 'string' ?
                 discountItem.item_description : 'Product' }}</h3>
+
+              <!-- Add validity period if available -->
+              <div class="validity-period" v-if="discountItem.offer_start_date && discountItem.offer_end_date">
+                <i class="pi pi-calendar"></i>
+                <span>{{ formatDate(discountItem.offer_start_date) }} - {{ formatDate(discountItem.offer_end_date) }}</span>
+              </div>
+
               <div class="price-container">
                 <span class="original-price" v-if="discountItem.discount_percentage">
                   {{ getOriginalPrice(discountItem) }}€
@@ -45,7 +65,8 @@
             </div>
             <Button
               icon="pi pi-shopping-cart"
-              label="Add to Cart"
+              :label="isInCart(discountItem) ? 'Already in Wishlist' : 'Add to Wishlist'"
+              :disabled="isInCart(discountItem)"
               @click="store.addToCart(discountItem)"
             />
           </div>
@@ -65,11 +86,24 @@ import type { Discounts } from '@/types'
 const route = useRoute()
 const store = useAppStore()
 const loading = ref(false)
+const filteredResults = ref<Discounts[]>([])
 
 // Calculate original price from discount price and percentage
 const getOriginalPrice = (discountItem: Discounts): string => {
   if (!discountItem.discount_percentage) return discountItem.discount_price.toFixed(2);
   return (discountItem.discount_price / (1 - discountItem.discount_percentage / 100)).toFixed(2)
+}
+
+// Format date function to match HomeView
+function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  return `${date.getDate()}.${date.getMonth() + 1}`
+}
+
+// Check if item is in cart function to match HomeView
+function isInCart(discountItem: Discounts) {
+  return store.shoppingCart.some((item) =>
+    'discount' in item ? item.discount._id === discountItem._id : item._id === discountItem._id)
 }
 
 // Watch for URL query changes to trigger search
@@ -81,7 +115,11 @@ watch(
       loading.value = true
       console.log('Searching for:', queryString)
 
-      // Use the store's existing searchProducts function with its expected parameters
+      // Get selected stores if any
+      const selectedStoresParam = newQuery.stores as string
+      const selectedStores = selectedStoresParam ? selectedStoresParam.split(',') : []
+
+      // Only make the API call if we don't already have results or the search query changed
       store.searchProducts({
         name: queryString,
         orderBy: 'discount_percentage',
@@ -89,22 +127,33 @@ watch(
       })
       .then(results => {
         console.log('Got search results:', results)
+
+        // Filter results by selected stores if any are selected
+        if (selectedStores.length > 0) {
+          console.log('Filtering by stores:', selectedStores)
+          filteredResults.value = store.searchResults.filter(item =>
+            selectedStores.includes(item.store)
+          )
+        } else {
+          // If no stores selected, show all results
+          filteredResults.value = store.searchResults
+        }
       })
       .catch(error => {
         console.error('Search error:', error)
+        filteredResults.value = []
       })
       .finally(() => {
         loading.value = false
-        console.log('Search completed, results:', store.searchResults)
       })
     } else {
       // Clear results if there's no query
       store.searchResults = []
+      filteredResults.value = []
     }
   },
-  { immediate: true }
+  { immediate: true, deep: true } // Make sure we track deep changes to query objects
 )
-
 </script>
 
 <style scoped>
@@ -172,14 +221,15 @@ h1 {
   margin-top: 1rem;
 }
 
+/* Grid layout - same as in HomeView */
 .grid {
   display: flex;
   flex-wrap: wrap;
-  margin: -0.75rem;
+  margin: -0.5rem;
 }
 
 .grid [class*="col-"] {
-  padding: 0.75rem;
+  padding: 0.5rem;
 }
 
 .col-12 {
@@ -201,107 +251,123 @@ h1 {
   }
 }
 
-.card {
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  border: 1px solid #E0E0E0;
-}
-
+/* Product card styles - exactly as in HomeView */
 .product-card {
   position: relative;
-  padding: 1.75rem;
+  padding: 1.5rem;
   height: 100%;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s ease;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  overflow: visible;
 }
 
 .product-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .discount-tag {
   position: absolute;
-  top: 0;
-  right: 0;
-  background: #FF6B6B;
+  top: -12px;
+  right: -12px;
+  background: #ff5252;
   color: white;
-  padding: 0.35rem 0.75rem;
-  border-radius: 0 12px 0 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: bold;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 8px rgba(255, 82, 82, 0.3);
+  z-index: 1;
+  transform: rotate(12deg);
 }
 
 .store-tag {
   position: absolute;
   top: 0;
   left: 0;
-  padding: 0.35rem 0.75rem;
-  border-radius: 12px 0 12px 0;
-  color: white;
-  font-weight: bold;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 16px 0;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.store-lidl {
-  background: #0050AA;
+.store-logo {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
 }
 
-.store-hofer {
-  background: #E30613;
-}
-
-.store-spar {
-  background: #008C45;
-}
-
-.store-mercator {
-  background: #CE1126;
-}
-
-.store-eurospin {
-  background: #0066CC;
+.store-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2c2c2c;
 }
 
 .product-details {
-  margin: 2rem 0 1.5rem;
+  margin: 1.5rem 0;
+  color: black;
 }
 
 .product-details h3 {
-  color: #2C2C2C;
+  font-size: 1.6rem;
   font-weight: 600;
-  margin-bottom: 0.75rem;
-  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+  color: #2c2c2c;
+}
+
+.validity-period {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+  color: #666;
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 8px;
+}
+
+.validity-period i {
+  color: #4caf50;
 }
 
 .price-container {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 1rem;
-  margin-top: 0.75rem;
-  margin-bottom: 1.25rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(76, 175, 80, 0.05);
+  border-radius: 12px;
 }
 
 .original-price {
   text-decoration: line-through;
-  color: #666666;
-  font-size: 0.9rem;
+  color: #6c757d;
+  font-size: 1.2rem;
+  opacity: 0.7;
 }
 
 .discount-price {
-  font-weight: bold;
-  color: #77D28C;
-  font-size: 1.3rem;
-}
-
-.p-button {
-  background-color: #4A90E2;
-  border-color: #4A90E2;
+  font-weight: 700;
+  color: #4caf50;
+  font-size: 1.8rem;
+  padding: 0.25rem 0.75rem;
   border-radius: 8px;
-  width: 100%;
-}
-
-.p-button:hover {
-  background-color: #3A80D2;
-  border-color: #3A80D2;
+  background: white;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
 }
 
 @media (max-width: 768px) {

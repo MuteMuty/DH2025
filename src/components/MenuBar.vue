@@ -83,7 +83,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import Menubar from 'primevue/menubar'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
@@ -141,25 +141,36 @@ const handleSearchInput = (event: any) => {
   if (query.length >= 2) {
     // Set new timeout for debounce (300ms)
     debounceTimeout.value = setTimeout(() => {
+      // Build query object
+      const queryObject: Record<string, string> = { q: query }
+
+      // Only add stores filter if at least one store is selected
+      if (selectedStores.value.length > 0) {
+        queryObject.stores = selectedStores.value.join(',')
+      }
+
       // Only navigate if we're not already on the search page
       if (route.name !== 'search') {
         router.push({
           path: '/search',
-          query: {
-            q: query,
-            ...(selectedStores.value.length > 0 ? { stores: selectedStores.value.join(',') } : {}),
-          },
+          query: queryObject
         })
       } else {
         // If already on search page, just update the query parameter
+        // Make sure we preserve any existing query parameters that aren't being updated
         router.replace({
           query: {
-            ...route.query,
-            q: query,
-            ...(selectedStores.value.length > 0 ? { stores: selectedStores.value.join(',') } : {}),
-          },
+            ...queryObject
+          }
         })
       }
+
+      // Always call searchProducts with the current query and apply filters in the view
+      store.searchProducts({
+        name: query,
+        orderBy: 'discount_percentage',
+        sortOrder: 'desc'
+      })
     }, 300)
   }
 }
@@ -198,6 +209,25 @@ const cartCount = computed(() => {
 // Initialize cart data when component is mounted
 onMounted(async () => {
   await store.getShoppingCart()
+})
+
+// Add this watch to the MenuBar component's script section
+watch(selectedStores, (newStores) => {
+  // Only update if we're already on the search page and have a search query
+  if (route.name === 'search' && searchQuery.value.length >= 2) {
+    const queryObject: Record<string, string> = {
+      q: searchQuery.value
+    }
+
+    if (newStores.length > 0) {
+      queryObject.stores = newStores.join(',')
+    }
+
+    // Update the URL without navigating
+    router.replace({
+      query: queryObject
+    })
+  }
 })
 </script>
 
