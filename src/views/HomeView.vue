@@ -39,7 +39,8 @@
             </div>
             <Button
               icon="pi pi-shopping-cart"
-              label="Add to Cart"
+              :label="isInCart(discountItem) ? 'Already in Cart' : 'Add to Cart'"
+              :disabled="isInCart(discountItem)"
               @click="store.addToCart(discountItem)"
             />
           </div>
@@ -58,6 +59,12 @@ import { Store, type Discounts } from '@/types'
 
 function getOgPrice(discountItem: Discounts) {
   return (discountItem.discount_price / (1 - discountItem.discount_percentage / 100)).toFixed(2)
+}
+
+function isInCart(discountItem: Discounts) {
+  console.log('store.shoppingCart', store.shoppingCart)
+  // @ts-ignore
+  return store.shoppingCart.some((item) => item.discount._id === discountItem._id)
 }
 
 const router = useRouter()
