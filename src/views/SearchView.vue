@@ -42,7 +42,11 @@
           v-for="(discountItem, index) in sortedResults"
           :key="discountItem._id"
         >
-          <div v-show="animateItems[index]" class="card product-card fade-in">
+          <div
+            v-show="animateItems[index]"
+            class="card product-card fade-in"
+            @dblclick="showProductDetail(discountItem)"
+          >
             <!-- Circular discount tag like in HomeView -->
             <div class="discount-tag" v-if="discountItem.discount_percentage">
               -{{ discountItem.discount_percentage }}%
@@ -96,6 +100,12 @@
         </div>
       </div>
     </div>
+
+    <!-- Add the ProductDetailPopup component -->
+    <ProductDetailPopup
+      v-model:visible="showPopup"
+      :product="selectedProduct"
+    />
   </div>
 </template>
 
@@ -106,6 +116,7 @@ import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown' // Add this import
 import { useAppStore } from '@/stores/appStore'
 import type { Discounts } from '@/types'
+import ProductDetailPopup from '@/components/ProductDetailPopup.vue'
 
 const route = useRoute()
 const store = useAppStore()
@@ -182,6 +193,16 @@ const setupAnimation = (count: number) => {
       100 + i * 100,
     ) // 100ms delay between each item
   }
+}
+
+// Add new variables for popup
+const showPopup = ref(false)
+const selectedProduct = ref<Discounts | null>(null)
+
+// Function to show product detail popup
+function showProductDetail(product: Discounts) {
+  selectedProduct.value = product
+  showPopup.value = true
 }
 
 // Watch for URL query changes to trigger search
@@ -348,6 +369,7 @@ h1 {
   flex-direction: column;
   justify-content: space-between;
   justify-content: flex-end;
+  cursor: pointer;
 }
 
 .product-card:hover {

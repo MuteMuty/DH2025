@@ -24,7 +24,11 @@
           v-for="(cartItem, index) in cartItems"
           :key="cartItem.cart_item_id"
         >
-          <div v-show="animateItems[index]" class="card product-card fade-in">
+          <div
+            v-show="animateItems[index]"
+            class="card product-card fade-in"
+            @dblclick="showProductDetail(cartItem.discount)"
+          >
             <div class="discount-tag" v-if="cartItem.discount.discount_percentage">
               -{{ cartItem.discount.discount_percentage }}%
             </div>
@@ -69,12 +73,22 @@
       </div>
     </div>
   </div>
+
+  <!-- Add the ProductDetailPopup component -->
+  <ProductDetailPopup
+    v-model:visible="showPopup"
+    :product="selectedProduct"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAppStore } from '@/stores/appStore'
 import Button from 'primevue/button'
+import ProductDetailPopup from '@/components/ProductDetailPopup.vue'
+
+// Import the Store enum
+import { type Discounts, Store } from '@/types'
 
 interface CartItem {
   cart_item_id: string
@@ -103,6 +117,11 @@ const loading = ref(true)
 const cartItems = ref<CartItem[]>([])
 // Add animation state array
 const animateItems = ref<boolean[]>([])
+
+// Add new variables for popup
+const showPopup = ref(false)
+
+const selectedProduct = ref<Discounts | null>(null)
 
 // Format the date to be more user friendly
 const formatDate = (dateString: string): string => {
@@ -212,6 +231,17 @@ const setupAnimation = (items: CartItem[]) => {
       100 + i * 100,
     ) // 100ms delay between each item
   }
+}
+
+// Function to show product detail popup
+function showProductDetail(product: any) {
+  // Make a copy of the product and ensure store is properly typed
+  const typedProduct: Discounts = {
+    ...product,
+    store: product.store as Store // Force the string to be treated as a Store enum value
+  }
+  selectedProduct.value = typedProduct
+  showPopup.value = true
 }
 </script>
 
@@ -362,6 +392,7 @@ h1 {
   flex-direction: column;
   justify-content: space-between;
   justify-content: flex-end;
+  cursor: pointer;
 }
 
 .product-card:hover {
