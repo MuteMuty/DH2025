@@ -4,17 +4,6 @@
       <div class="hero-content">
         <h1>The Saving Grace</h1>
         <p class="subtitle">Because buying full price is a sin</p>
-        <div class="search-box">
-          <span class="p-input-icon-left">
-            <i class="pi pi-search" />
-            <InputText
-              v-model="searchQuery"
-              placeholder="Search for products..."
-              @keyup.enter="searchProducts"
-            />
-          </span>
-          <Button label="Search" icon="pi pi-search" @click="searchProducts" />
-        </div>
       </div>
     </section>
 
@@ -79,23 +68,6 @@
       </div>
     </section>
 
-    <section class="stores-section">
-      <h2>Popular Stores</h2>
-      <div class="stores-grid">
-        <div
-          v-for="(store, index) in stores"
-          :key="store"
-          v-show="animateStores[index]"
-          class="store-item fade-in"
-          @click="$router.push(`/search?store=${store}`)"
-        >
-          <div class="store-logo" :class="`bg-${store.toLowerCase()}`">
-            <span>{{ store[0] }}</span>
-          </div>
-          <span class="store-name">{{ store }}</span>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
@@ -125,39 +97,10 @@ const animateDeals = ref([false, false, false, false])
 const animateStores = ref([false, false, false, false])
 
 // Navigation items for the cards section
-const navItems = [
-  {
-    label: 'Shopping Cart',
-    icon: 'pi pi-shopping-cart',
-    route: '/shopping-cart',
-    description: 'View and manage items in your cart',
-  },
-  {
-    label: 'Trending Deals',
-    icon: 'pi pi-trending-up',
-    route: '/trending',
-    description: 'See what products are trending now',
-  },
-  {
-    label: 'Search Products',
-    icon: 'pi pi-search',
-    route: '/search',
-    description: 'Find products across all stores',
-  },
-]
 
 // Mock data for stores
 const stores = ref<Store[]>([Store.Lidl, Store.Hofer, Store.Spar, Store.Mercator, Store.Eurospin])
 
-// Function to handle search
-const searchProducts = () => {
-  if (searchQuery.value.trim()) {
-    router.push({
-      path: '/search',
-      query: { q: searchQuery.value },
-    })
-  }
-}
 
 // Start animation sequence when component is mounted
 onMounted(() => {
@@ -229,11 +172,6 @@ onMounted(() => {
   margin-bottom: 2rem;
 }
 
-.search-box {
-  display: flex;
-  max-width: 600px;
-  margin: 0 auto;
-}
 
 .search-box .p-inputtext {
   flex-grow: 1;
