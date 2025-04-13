@@ -1,11 +1,6 @@
 <template>
   <div class="home-container">
-    <section class="hero-section">
-      <div class="hero-content">
-        <img src="/SavingGrace-logo.png" alt="The Saving Grace" class="hero-logo" />
-        <p class="subtitle">Because buying full price is a sin</p>
-      </div>
-    </section>
+    <section class="hero-section"></section>
 
     <section class="trending-section">
       <div class="section-header">
@@ -128,6 +123,11 @@ onMounted(() => {
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background-image: url('/benis2.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 250px;
 }
 
 .hero-content h1 {
@@ -135,7 +135,7 @@ onMounted(() => {
   margin-bottom: 0.25rem;
   color: #2c2c2c;
   font-weight: 700;
-  background: linear-gradient(120deg, #2c2c2c 0%, #4caf50 100%);
+  /* background: linear-gradient(120deg, #2c2c2c 0%, #4caf50 100%); */
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
